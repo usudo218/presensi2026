@@ -367,3 +367,60 @@
                 const st = absen[s.id] || "";
                 let bg=""; if(st=='H') bg='bg-h'; if(st=='S') bg='bg-s'; if(st=='I') bg='bg-i'; if(st=='A') bg='bg-a';
                 let badge = st ? `<span class="badge ${bg}">${st}</span>` : '-';
+                return `<tr><td class="text-center">${i+1}</td><td>${s.nama}</td><td class="text-center">${badge}</td><td>${getKet(st)}</td></tr>`;
+            }).join('');
+        }
+    }
+
+    function renderNilai() {
+        const siswaKelas = dataSiswa.filter(s => s.kelas === currentKelas);
+        const info = dbInfoTugas[currentKelas] || {};
+        ['t1','t2','t3','t4','t5'].forEach(k => { document.getElementById('info-'+k).value = info[k] || ""; });
+        document.getElementById('body-nilai').innerHTML = siswaKelas.map((s, i) => {
+            if(!s.n.t1) s.n.t1=0; if(!s.n.t2) s.n.t2=0; if(!s.n.t3) s.n.t3=0; if(!s.n.t4) s.n.t4=0; if(!s.n.t5) s.n.t5=0;
+            const n = s.n; const total = n.t1+n.t2+n.t3+n.t4+n.t5+n.uh1+n.uh2+n.uts+n.uas; const avg = (total / 9).toFixed(1);
+            return `<tr><td class="text-center">${i+1}</td><td>${s.nama}</td>
+            <td><input class="input-nilai" type="number" value="${n.t1}" onchange="saveN('${s.id}','t1',this.value)"></td>
+            <td><input class="input-nilai" type="number" value="${n.t2}" onchange="saveN('${s.id}','t2',this.value)"></td>
+            <td><input class="input-nilai" type="number" value="${n.t3}" onchange="saveN('${s.id}','t3',this.value)"></td>
+            <td><input class="input-nilai" type="number" value="${n.t4}" onchange="saveN('${s.id}','t4',this.value)"></td>
+            <td><input class="input-nilai" type="number" value="${n.t5}" onchange="saveN('${s.id}','t5',this.value)"></td>
+            <td><input class="input-nilai" type="number" value="${n.uh1}" onchange="saveN('${s.id}','uh1',this.value)"></td>
+            <td><input class="input-nilai" type="number" value="${n.uh2}" onchange="saveN('${s.id}','uh2',this.value)"></td>
+            <td><input class="input-nilai" type="number" value="${n.uts}" onchange="saveN('${s.id}','uts',this.value)"></td>
+            <td><input class="input-nilai" type="number" value="${n.uas}" onchange="saveN('${s.id}','uas',this.value)"></td>
+            <td class="text-center text-bold">${avg}</td></tr>`;
+        }).join('');
+    }
+
+    function renderPresensi() {
+        const tgl = document.getElementById('tgl-harian').value;
+        const keyJurnal = currentKelas + "_" + tgl;
+        document.getElementById('pertemuan-ke').value = dbJurnal[keyJurnal] || "1";
+        const siswaKelas = dataSiswa.filter(s => s.kelas === currentKelas);
+        const dataHari = dbAbsen[tgl] || {};
+        document.getElementById('body-presensi').innerHTML = siswaKelas.map((s, i) => {
+            const st = dataHari[s.id] || "";
+            let cls = ""; if(st=='H') cls='bg-h'; if(st=='S') cls='bg-s'; if(st=='I') cls='bg-i'; if(st=='A') cls='bg-a';
+            return `<tr><td class="text-center">${i+1}</td><td>${s.nama}</td>
+            <td><select class="status-select ${cls}" onchange="simpanAbsen('${s.id}', this.value)">
+                <option value="" ${st===''?'selected':''}>-</option><option value="H" ${st=='H'?'selected':''}>Hadir</option>
+                <option value="S" ${st=='S'?'selected':''}>Sakit</option><option value="I" ${st=='I'?'selected':''}>Izin</option>
+                <option value="A" ${st=='A'?'selected':''}>Alpha</option></select></td><td><small>${getKet(st)}</small></td></tr>`;
+        }).join('');
+    }
+
+    function simpanAbsen(id, val) { const tgl = document.getElementById('tgl-harian').value; if(!dbAbsen[tgl]) dbAbsen[tgl] = {}; dbAbsen[tgl][id] = val; localStorage.setItem('app_sman1_absen', JSON.stringify(dbAbsen)); renderPresensi(); }
+    function simpanJurnal() { const tgl = document.getElementById('tgl-harian').value; const val = document.getElementById('pertemuan-ke').value; const key = currentKelas + "_" + tgl; dbJurnal[key] = val; localStorage.setItem('app_sman1_jurnal', JSON.stringify(dbJurnal)); }
+    function saveN(id, col, val) { let s = dataSiswa.find(x => x.id === id); if(s) { s.n[col] = parseInt(val) || 0; localStorage.setItem('app_sman1_siswa', JSON.stringify(dataSiswa)); renderNilai(); } }
+    function simpanInfoTugas(col, val) { if(!dbInfoTugas[currentKelas]) dbInfoTugas[currentKelas] = {}; dbInfoTugas[currentKelas][col] = val; localStorage.setItem('app_sman1_infotugas', JSON.stringify(dbInfoTugas)); }
+    function exportExcel() { if(!currentKelas) return alert("Pilih kelas dulu!"); const table = document.getElementById('tabel-rekap'); const wb = XLSX.utils.table_to_book(table, {sheet: "Rekap"}); const mode = document.getElementById('mode-rekap').value; const periode = (mode==='bulanan') ? document.getElementById('filter-bulan').value : document.getElementById('filter-tanggal').value; const filename = "Rekap_" + currentKelas.replace(/ /g, '_') + "_" + periode + ".xlsx"; XLSX.writeFile(wb, filename); }
+    function sinkronisasi(alertMsg=true) { let count = 0; MASTER_SISWA.forEach(m => { const exist = dataSiswa.find(d => d.nama === m.nama && d.kelas === m.kelas); if(!exist) { dataSiswa.push({id: 'S'+Date.now()+Math.floor(Math.random()*999), nama: m.nama, kelas: m.kelas, n: {t1:0,t2:0,t3:0,t4:0,t5:0,uh1:0,uh2:0,uts:0,uas:0}}); count++; } }); localStorage.setItem('app_sman1_siswa', JSON.stringify(dataSiswa)); if(alertMsg) alert(count + " Siswa baru ditambahkan!"); document.getElementById('count-siswa').innerText = dataSiswa.length; initUI(); }
+    function resetAll() { if(confirm("Yakin hapus semua data?")) { localStorage.clear(); location.reload(); } }
+    function getKet(s) { if(s=='H') return 'Hadir'; if(s=='S') return 'Sakit'; if(s=='I') return 'Izin'; if(s=='A') return 'Alpha'; return ''; }
+    
+    document.getElementById('count-siswa').innerText = dataSiswa.length;
+</script>
+
+</body>
+</html>
