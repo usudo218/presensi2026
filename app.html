@@ -353,4 +353,88 @@
         if(!currentKelas) return;
         const mode = document.getElementById('mode-rekap').value;
         const siswa = dataSiswa.filter(s => s.kelas === currentKelas);
-        const head = document.getElementById('head
+        const head = document.getElementById('head-rekap');
+        const body = document.getElementById('body-rekap');
+
+        if(mode === 'bulanan') {
+            // MODE MATRIKS BULANAN
+            const bln = document.getElementById('filter-bulan').value;
+            document.getElementById('print-periode').innerText = "PERIODE: " + bln;
+
+            // Cari tanggal yang ada isinya di bulan ini
+            let dates = [];
+            Object.keys(dbAbsen).forEach(tgl => {
+                if(tgl.startsWith(bln) && siswa.some(s => dbAbsen[tgl][s.id])) dates.push(tgl);
+            });
+            dates.sort();
+
+            let hRow = `<tr><th rowspan="2" width="30px">No</th><th rowspan="2" style="min-width:200px;text-align:left;">Nama Siswa</th>`;
+            if(dates.length>0) {
+                dates.forEach(tgl => {
+                    const pert = dbJurnal[currentKelas+"_"+tgl] || "";
+                    hRow += `<th class="text-center cell-date">${tgl.split('-')[2]}<br><small>${pert?'P-'+pert:''}</small></th>`;
+                });
+            } else { hRow += `<th>-</th>`; }
+            hRow += `<th colspan="4">Total</th></tr><tr>`;
+            if(dates.length===0) hRow += `<th></th>`; else dates.forEach(()=>hRow+=`<th></th>`); // Spacer row
+            hRow += `<th>H</th><th>S</th><th>I</th><th>A</th></tr>`; /* Cleaned up spacer row logic */
+            
+            // Re-render Header Correctly
+            let finalHead = `<tr><th rowspan="2" width="30px">No</th><th rowspan="2" style="min-width:200px;text-align:left;">Nama Siswa</th>`;
+            finalHead += `<th colspan="${dates.length||1}">Tanggal</th><th colspan="4">Total</th></tr><tr>`;
+            if(dates.length===0) finalHead += `<th>-</th>`;
+            else dates.forEach(tgl => {
+                const pert = dbJurnal[currentKelas+"_"+tgl] || "";
+                finalHead += `<th class="text-center cell-date" style="background:#fff;">${tgl.split('-')[2]}<br><small style="font-size:0.6em">${pert}</small></th>`;
+            });
+            finalHead += `<th>H</th><th>S</th><th>I</th><th>A</th></tr>`;
+            head.innerHTML = finalHead;
+
+            body.innerHTML = siswa.map((s, i) => {
+                let h=0, sk=0, ij=0, al=0;
+                let cols = "";
+                if(dates.length === 0) cols = "<td class='text-center'>-</td>";
+                else {
+                    dates.forEach(tgl => {
+                        const st = dbAbsen[tgl] ? (dbAbsen[tgl][s.id]||"") : "";
+                        if(st=='H') h++; if(st=='S') sk++; if(st=='I') ij++; if(st=='A') al++;
+                        let bg=""; if(st=='S') bg='bg-s'; if(st=='I') bg='bg-i'; if(st=='A') bg='bg-a';
+                        cols += `<td class="text-center ${bg} cell-status">${st}</td>`;
+                    });
+                }
+                return `<tr><td class="text-center">${i+1}</td><td>${s.nama}</td>${cols}
+                <td class="text-center text-bold">${h}</td><td class="text-center">${sk}</td><td class="text-center">${ij}</td><td class="text-center" style="color:red;font-weight:bold;">${al}</td></tr>`;
+            }).join('');
+
+        } else {
+            // MODE HARIAN (KEMBALI KE ASAL)
+            const tgl = document.getElementById('filter-tanggal').value;
+            const pert = dbJurnal[currentKelas+"_"+tgl] || "-";
+            document.getElementById('print-periode').innerText = "TANGGAL: " + tgl + " (Pertemuan ke-" + pert + ")";
+            head.innerHTML = `<tr><th width="5%">No</th><th>Nama</th><th width="15%">Status</th><th>Keterangan</th></tr>`;
+            const absen = dbAbsen[tgl] || {};
+            body.innerHTML = siswa.map((s, i) => {
+                const st = absen[s.id] || "";
+                let bg=""; if(st=='H') bg='bg-h'; if(st=='S') bg='bg-s'; if(st=='I') bg='bg-i'; if(st=='A') bg='bg-a';
+                let badge = st ? `<span class="badge ${bg}">${st}</span>` : '-';
+                return `<tr><td class="text-center">${i+1}</td><td>${s.nama}</td><td class="text-center">${badge}</td><td>${getKet(st)}</td></tr>`;
+            }).join('');
+        }
+    }
+
+    function exportExcel() {
+        if(!currentKelas) return alert("Pilih kelas dulu!");
+        const table = document.getElementById('tabel-rekap');
+        const wb = XLSX.utils.table_to_book(table, {sheet: "Rekap"});
+        const mode = document.getElementById('mode-rekap').value;
+        const periode = (mode==='bulanan') ? document.getElementById('filter-bulan').value : document.getElementById('filter-tanggal').value;
+        const filename = "Rekap_" + currentKelas.replace(/ /g, '_') + "_" + periode + ".xlsx";
+        XLSX.writeFile(wb, filename);
+    }
+
+    function getKet(s) { if(s=='H') return 'Hadir'; if(s=='S') return 'Sakit'; if(s=='I') return 'Izin'; if(s=='A') return 'Alpha'; return ''; }
+    document.getElementById('count-siswa').innerText = dataSiswa.length;
+</script>
+
+</body>
+</html>
