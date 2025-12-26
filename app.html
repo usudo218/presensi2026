@@ -7,51 +7,105 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
     <style>
-        :root { --primary: #0056b3; --bg: #f4f6f9; --white: #ffffff; --border: #ced4da; --h: #d4edda; --ht: #155724; --s: #fff3cd; --st: #856404; --i: #cce5ff; --it: #004085; --a: #f8d7da; --at: #721c24; }
+        :root { 
+            --primary: #0056b3; --bg: #f4f6f9; --white: #ffffff; --border: #ced4da;
+            --h: #d4edda; --ht: #155724; 
+            --s: #fff3cd; --st: #856404; 
+            --i: #cce5ff; --it: #004085; 
+            --a: #f8d7da; --at: #721c24; 
+        }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); padding: 0; margin: 0; color: #333; display: flex; flex-direction: column; min-height: 100vh; }
+        
+        /* CONTAINER */
         .container { max-width: 1250px; margin: 20px auto; background: var(--white); border-radius: 8px; box-shadow: 0 0 15px rgba(0,0,0,0.1); overflow: hidden; flex: 1; width: 95%; }
+        
+        /* HEADER */
         .header { background: var(--primary); color: white; padding: 20px; text-align: center; }
         .header h1 { margin: 0; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px; }
         .header p { margin: 5px 0 0; font-size: 0.9rem; opacity: 0.9; }
+
+        /* KELAS BAR */
         .kelas-bar { background: #e9ecef; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
         .kelas-selector select { padding: 8px 12px; font-size: 1rem; border: 1px solid #aaa; border-radius: 4px; font-weight: bold; }
+
+        /* TABS */
         .tabs { display: flex; background: #dee2e6; overflow-x: auto; }
         .tab-btn { flex: 1; min-width: 100px; padding: 12px; border: none; background: transparent; cursor: pointer; font-weight: 600; color: #495057; transition: 0.3s; border-bottom: 3px solid transparent; }
         .tab-btn:hover { background: #ced4da; }
         .tab-btn.active { background: var(--white); color: var(--primary); border-bottom: 3px solid var(--primary); }
+
+        /* CONTENT */
         .tab-content { padding: 20px; display: none; }
         .tab-content.active { display: block; }
+
+        /* TOOLBAR */
         .toolbar { display: flex; gap: 15px; margin-bottom: 15px; background: #f8f9fa; padding: 15px; border-radius: 5px; border: 1px solid var(--border); flex-wrap: wrap; align-items: center; }
+        
+        /* TABLES */
         .table-wrap { overflow-x: auto; width: 100%; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; min-width: 800px; }
         th, td { padding: 5px; border: 1px solid #dee2e6; text-align: left; vertical-align: middle; }
         th { background-color: #f1f3f5; font-weight: bold; text-align: center; }
         tr:nth-child(even) { background-color: #f8f9fa; }
+        
+        /* SPESIFIK REKAP (BORDER TEGAS) */
+        #tabel-rekap { border: 2px solid #000; }
+        #tabel-rekap th, #tabel-rekap td { border: 1px solid #000 !important; }
+
+        /* TEXT UTILS */
         .text-center { text-align: center !important; }
         .text-bold { font-weight: bold; }
-        .cell-date { font-size: 0.8rem; min-width: 25px; }
+        
+        /* MATRIX CELLS */
+        .cell-date { font-size: 0.8rem; min-width: 35px; }
         .cell-status { font-weight: bold; font-size: 0.8rem; }
-        .bg-h { background: var(--h); color: var(--ht); } .bg-s { background: var(--s); color: var(--st); } .bg-i { background: var(--i); color: var(--it); } .bg-a { background: var(--a); color: var(--at); }
+        
+        /* COLORS */
+        .bg-h { background: var(--h); color: var(--ht); }
+        .bg-s { background: var(--s); color: var(--st); }
+        .bg-i { background: var(--i); color: var(--it); }
+        .bg-a { background: var(--a); color: var(--at); }
+        
+        /* INPUTS */
         input.input-nilai { width: 40px; text-align: center; padding: 4px; border: 1px solid #ccc; border-radius: 3px; }
         input.input-header { width: 90%; font-size: 0.8rem; padding: 3px; margin-top: 5px; border: 1px solid #aaa; border-radius: 3px; text-align: center; background: #fff; color: #333; }
         select.status-select { padding: 5px; border-radius: 4px; width: 100%; cursor: pointer; }
+        
+        /* BADGE */
         .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; text-align: center; display: inline-block; }
+
         .hidden { display: none; }
         .btn { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; color: white; }
-        .btn-green { background: #28a745; } .btn-print { background: #6c757d; } .btn-blue { background: #007bff; } .btn-red { background: #dc3545; }
+        .btn-green { background: #28a745; }
+        .btn-print { background: #6c757d; }
+        .btn-blue { background: #007bff; }
+        .btn-red { background: #dc3545; }
         .footer { background: #343a40; color: #adb5bd; text-align: center; padding: 20px; font-size: 0.85rem; line-height: 1.6; margin-top: auto; border-top: 4px solid var(--primary); }
         .signature-block { display: none; }
 
+        /* --- PRINT SETTINGS --- */
         @media print {
             .header, .kelas-bar, .tabs, .toolbar, #tab-setting, .footer { display: none !important; }
             .container { box-shadow: none; max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
             .table-wrap { overflow: visible; width: 100%; }
-            table { width: 100% !important; min-width: 0 !important; border: 1px solid #000; }
-            th, td { border: 1px solid #000; padding: 2px; color: #000; }
+            table { width: 100% !important; min-width: 0 !important; border: 2px solid #000; }
+            
+            /* Border Cetak Lebih Tegas */
+            th, td { border: 1px solid #000 !important; padding: 2px; color: #000; }
+            
+            /* Header Cetak */
             .print-header { display: block !important; margin-bottom: 10px; font-weight: bold; text-align: center; font-size: 14pt; border-bottom: 2px solid #000; padding-bottom: 5px; }
+            
+            /* Tanda Tangan */
             .signature-block { display: block !important; margin-top: 15px; float: right; width: 250px; text-align: center; page-break-inside: avoid; }
+
             input.input-header, input.input-nilai { border: none; background: transparent; font-weight: bold; text-align: center; padding: 0; }
-            .bg-h { background-color: #f0f0f0 !important; -webkit-print-color-adjust: exact; } .bg-s { background-color: #fff3cd !important; -webkit-print-color-adjust: exact; } .bg-a { background-color: #f8d7da !important; -webkit-print-color-adjust: exact; }
+            
+            /* Warna Background di Print */
+            .bg-h { background-color: #f0f0f0 !important; -webkit-print-color-adjust: exact; }
+            .bg-s { background-color: #fff3cd !important; -webkit-print-color-adjust: exact; }
+            .bg-a { background-color: #f8d7da !important; -webkit-print-color-adjust: exact; }
+            
             @page { margin: 1cm; }
         }
         .print-header { display: none; }
@@ -60,8 +114,16 @@
 <body>
 
 <script>
-    if(sessionStorage.getItem('sudah_login') !== 'ya') { alert("Anda harus login terlebih dahulu!"); window.location.href = 'index.html'; }
-    function logout() { if(confirm("Yakin ingin keluar?")) { sessionStorage.removeItem('sudah_login'); window.location.href = 'index.html'; } }
+    if(sessionStorage.getItem('sudah_login') !== 'ya') {
+        alert("Anda harus login terlebih dahulu!");
+        window.location.href = 'index.html';
+    }
+    function logout() {
+        if(confirm("Yakin ingin keluar?")) {
+            sessionStorage.removeItem('sudah_login');
+            window.location.href = 'index.html';
+        }
+    }
 </script>
 
 <div class="container">
@@ -71,7 +133,12 @@
     </div>
 
     <div class="kelas-bar">
-        <div class="kelas-selector"><label>📂 Pilih Kelas: </label><select id="pilih-kelas" onchange="gantiKelas()"><option value="">-- Pilih --</option></select></div>
+        <div class="kelas-selector">
+            <label>📂 Pilih Kelas: </label>
+            <select id="pilih-kelas" onchange="gantiKelas()">
+                <option value="">-- Pilih --</option>
+            </select>
+        </div>
         <strong id="info-kelas" style="color:#555;"></strong>
     </div>
 
@@ -85,17 +152,27 @@
 
     <div id="tab-presensi" class="tab-content active">
         <div class="toolbar">
-            <div><label>Tanggal:</label><br><input type="date" id="tgl-harian" onchange="renderPresensi()" style="padding:6px; border:1px solid #ccc; border-radius:4px;"></div>
-            <div><label><strong>Pertemuan Ke:</strong></label><br>
+            <div>
+                <label>Tanggal:</label><br>
+                <input type="date" id="tgl-harian" onchange="renderPresensi()" style="padding:6px; border:1px solid #ccc; border-radius:4px;">
+            </div>
+            <div>
+                <label><strong>Pertemuan Ke:</strong></label><br>
                 <select id="pertemuan-ke" onchange="simpanJurnal()" style="padding:6px; width:80px; border:1px solid #ccc; border-radius:4px; font-weight:bold;">
-                    <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
-                    <option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option>
-                    <option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option>
+                    <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+                    <option value="4">4</option><option value="5">5</option><option value="6">6</option>
+                    <option value="7">7</option><option value="8">8</option><option value="9">9</option>
+                    <option value="10">10</option><option value="11">11</option><option value="12">12</option>
+                    <option value="13">13</option><option value="14">14</option><option value="15">15</option>
+                    <option value="16">16</option>
                 </select>
             </div>
         </div>
         <div class="table-wrap">
-            <table id="tabel-presensi"><thead><tr><th width="5%">No</th><th>Nama Siswa</th><th width="20%">Status Kehadiran</th><th width="25%">Keterangan</th></tr></thead><tbody id="body-presensi"></tbody></table>
+            <table id="tabel-presensi">
+                <thead><tr><th width="5%">No</th><th>Nama Siswa</th><th width="20%">Status Kehadiran</th><th width="25%">Keterangan</th></tr></thead>
+                <tbody id="body-presensi"></tbody>
+            </table>
             <div id="msg-empty" class="hidden" style="text-align:center; padding:20px; color:#888;">Silakan Pilih Kelas Terlebih Dahulu</div>
         </div>
     </div>
@@ -103,31 +180,58 @@
     <div id="tab-nilai" class="tab-content">
         <p style="font-size:0.9rem; color:#666;"><i>Tips: Ketik nama materi tugas di kotak putih di bawah "Tugas X" agar tidak tertukar.</i></p>
         <div class="table-wrap">
-            <table><thead>
-                <tr><th rowspan="2" width="30px">No</th><th rowspan="2" style="min-width:200px;">Nama Siswa</th><th colspan="5">TUGAS HARIAN</th><th colspan="2">ULANGAN</th><th rowspan="2" width="50px">UTS</th><th rowspan="2" width="50px">UAS</th><th rowspan="2" width="50px">RATA</th></tr>
-                <tr>
-                    <th width="60px">Tugas 1<br><input class="input-header" id="info-t1" placeholder="Topik..." onchange="simpanInfoTugas('t1',this.value)"></th>
-                    <th width="60px">Tugas 2<br><input class="input-header" id="info-t2" placeholder="Topik..." onchange="simpanInfoTugas('t2',this.value)"></th>
-                    <th width="60px">Tugas 3<br><input class="input-header" id="info-t3" placeholder="Topik..." onchange="simpanInfoTugas('t3',this.value)"></th>
-                    <th width="60px">Tugas 4<br><input class="input-header" id="info-t4" placeholder="Topik..." onchange="simpanInfoTugas('t4',this.value)"></th>
-                    <th width="60px">Tugas 5<br><input class="input-header" id="info-t5" placeholder="Topik..." onchange="simpanInfoTugas('t5',this.value)"></th>
-                    <th width="50px">UH 1</th><th width="50px">UH 2</th>
-                </tr></thead><tbody id="body-nilai"></tbody></table>
+            <table>
+                <thead>
+                    <tr>
+                        <th rowspan="2" width="30px">No</th><th rowspan="2" style="min-width:200px;">Nama Siswa</th>
+                        <th colspan="5">TUGAS HARIAN (Input Topik/Materi Di Sini)</th>
+                        <th colspan="2">ULANGAN</th><th rowspan="2" width="50px">UTS</th><th rowspan="2" width="50px">UAS</th><th rowspan="2" width="50px">RATA</th>
+                    </tr>
+                    <tr>
+                        <th width="60px">Tugas 1<br><input class="input-header" id="info-t1" placeholder="Topik..." onchange="simpanInfoTugas('t1',this.value)"></th>
+                        <th width="60px">Tugas 2<br><input class="input-header" id="info-t2" placeholder="Topik..." onchange="simpanInfoTugas('t2',this.value)"></th>
+                        <th width="60px">Tugas 3<br><input class="input-header" id="info-t3" placeholder="Topik..." onchange="simpanInfoTugas('t3',this.value)"></th>
+                        <th width="60px">Tugas 4<br><input class="input-header" id="info-t4" placeholder="Topik..." onchange="simpanInfoTugas('t4',this.value)"></th>
+                        <th width="60px">Tugas 5<br><input class="input-header" id="info-t5" placeholder="Topik..." onchange="simpanInfoTugas('t5',this.value)"></th>
+                        <th width="50px">UH 1</th><th width="50px">UH 2</th>
+                    </tr>
+                </thead>
+                <tbody id="body-nilai"></tbody>
+            </table>
         </div>
     </div>
 
     <div id="tab-rekap" class="tab-content">
         <div class="toolbar">
-            <select id="mode-rekap" onchange="toggleRekap()" style="padding:8px;"><option value="bulanan">🗓 Rekap Bulanan (Matriks)</option><option value="harian">📆 Rekap Harian (Simpel)</option></select>
+            <select id="mode-rekap" onchange="toggleRekap()" style="padding:8px;">
+                <option value="bulanan">🗓 Rekap Bulanan (Matriks)</option>
+                <option value="harian">📆 Rekap Harian (Simpel)</option>
+            </select>
             <input type="month" id="filter-bulan" onchange="renderRekap()">
             <input type="date" id="filter-tanggal" class="hidden" onchange="renderRekap()">
-            <div style="margin-left:auto;"><button class="btn btn-green" onclick="exportExcel()">📥 Download .XLSX</button><button class="btn btn-print" onclick="window.print()">🖨 Cetak</button></div>
+            <div style="margin-left:auto;">
+                <button class="btn btn-green" onclick="exportExcel()">📥 Download .XLSX</button>
+                <button class="btn btn-print" onclick="window.print()">🖨 Cetak</button>
+            </div>
         </div>
-        <div class="print-header">REKAPITULASI PRESENSI KELAS <span id="print-kelas"></span><br><small id="print-periode" style="font-weight:normal"></small></div>
-        <div class="table-wrap"><table id="tabel-rekap"><thead id="head-rekap"></thead><tbody id="body-rekap"></tbody></table></div>
+        
+        <div class="print-header">
+            REKAPITULASI PRESENSI KELAS <span id="print-kelas"></span><br>
+            <small id="print-periode" style="font-weight:normal"></small>
+        </div>
+
+        <div class="table-wrap">
+            <table id="tabel-rekap">
+                <thead id="head-rekap"></thead>
+                <tbody id="body-rekap"></tbody>
+            </table>
+        </div>
+
         <div class="signature-block">
-            Muncar, <span id="tgl-cetak"></span><br>Guru Mata Pelajaran<br><br><br><br>
-            <strong><u>Agus Suyatno, S.Kom</u></strong><br>NIP. 19730213 202521 1 032
+            Muncar, <span id="tgl-cetak"></span><br>
+            Guru Mata Pelajaran<br><br><br><br>
+            <strong><u>Agus Suyatno, S.Kom</u></strong><br>
+            NIP. 19730213 202521 1 032
         </div>
     </div>
 
@@ -138,10 +242,13 @@
         <br><br><button class="btn btn-red" onclick="resetAll()">⚠ Hapus Semua Data</button>
     </div>
 
-    <div class="footer">© 2025 usudo.id | Guru Informatika<br>Design By Agus Tjakra | Powered By Cloudflare & Self-Hosted</div>
+    <div class="footer">
+        © 2025 usudo.id | Guru Informatika<br>Design By Agus Tjakra | Powered By Cloudflare & Self-Hosted
+    </div>
 </div>
 
 <script src="siswa.js"></script>
+
 <script>
     const MASTER_SISWA = (typeof SISWA_BARU !== 'undefined') ? SISWA_BARU : [];
     let dataSiswa = JSON.parse(localStorage.getItem('app_sman1_siswa')) || [];
@@ -153,6 +260,7 @@
     document.getElementById('tgl-harian').valueAsDate = new Date();
     document.getElementById('filter-bulan').value = new Date().toISOString().slice(0, 7);
     document.getElementById('filter-tanggal').valueAsDate = new Date();
+    
     const options = { day: 'numeric', month: 'long', year: 'numeric' };
     document.getElementById('tgl-cetak').innerText = new Date().toLocaleDateString('id-ID', options);
 
@@ -205,17 +313,26 @@
         const body = document.getElementById('body-rekap');
 
         if(mode === 'bulanan') {
+            // MODE MATRIKS BULANAN
             const bln = document.getElementById('filter-bulan').value;
             document.getElementById('print-periode').innerText = "PERIODE: " + bln;
+
+            // Cari tanggal yang ada isinya di bulan ini
             let dates = [];
-            Object.keys(dbAbsen).forEach(tgl => { if(tgl.startsWith(bln) && siswa.some(s => dbAbsen[tgl] && dbAbsen[tgl][s.id])) dates.push(tgl); });
+            Object.keys(dbAbsen).forEach(tgl => {
+                if(tgl.startsWith(bln) && siswa.some(s => dbAbsen[tgl][s.id])) dates.push(tgl);
+            });
             dates.sort();
 
-            let hRow = `<tr><th rowspan="2" width="30px">No</th><th rowspan="2" style="min-width:200px; text-align:left;">Nama Siswa</th>`;
+            let hRow = `<tr><th rowspan="2" width="30px">No</th><th rowspan="2" style="min-width:200px;text-align:left;">Nama Siswa</th>`;
             if(dates.length > 0) {
                 dates.forEach(tgl => {
                     const pert = dbJurnal[currentKelas+"_"+tgl] || "";
-                    hRow += `<th class="text-center cell-date" style="background:#fff">${tgl.split('-')[2]}<br><small style="font-size:0.6em; color:#666">${pert?'P-'+pert:''}</small></th>`;
+                    // FORMAT TANGGAL: DD/MM (Misal 05/12)
+                    const parts = tgl.split('-');
+                    const tglFormat = parts[2] + '/' + parts[1];
+                    
+                    hRow += `<th class="text-center cell-date" style="background:#fff">${tglFormat}<br><small style="font-size:0.6em; color:#666">${pert?'P-'+pert:''}</small></th>`;
                 });
             } else { hRow += `<th>-</th>`; }
             hRow += `<th colspan="4" style="background:#f0f0f0">Total</th></tr><tr>`;
@@ -229,15 +346,18 @@
                 if(dates.length === 0) cols = "<td class='text-center'>-</td>";
                 else {
                     dates.forEach(tgl => {
-                        const st = dbAbsen[tgl] ? (dbAbsen[tgl][s.id] || "") : "";
+                        const st = dbAbsen[tgl] ? (dbAbsen[tgl][s.id]||"") : "";
                         if(st=='H') h++; if(st=='S') sk++; if(st=='I') ij++; if(st=='A') al++;
-                        let bg = ""; if(st=='S') bg="bg-s"; else if(st=='I') bg="bg-i"; else if(st=='A') bg="bg-a";
-                        cols += `<td class="text-center ${bg} cell-status" style="border:1px solid #ddd;">${st}</td>`;
+                        let bg=""; if(st=='S') bg='bg-s'; if(st=='I') bg='bg-i'; if(st=='A') bg='bg-a';
+                        cols += `<td class="text-center ${bg} cell-status">${st}</td>`;
                     });
                 }
-                return `<tr><td class="text-center">${i+1}</td><td>${s.nama}</td>${cols}<td class="text-center text-bold">${h}</td><td class="text-center">${sk}</td><td class="text-center">${ij}</td><td class="text-center" style="color:red; font-weight:bold;">${al}</td></tr>`;
+                return `<tr><td class="text-center">${i+1}</td><td>${s.nama}</td>${cols}
+                <td class="text-center text-bold">${h}</td><td class="text-center">${sk}</td><td class="text-center">${ij}</td><td class="text-center" style="color:red;font-weight:bold;">${al}</td></tr>`;
             }).join('');
+
         } else {
+            // MODE HARIAN (KEMBALI KE ASAL)
             const tgl = document.getElementById('filter-tanggal').value;
             const pert = dbJurnal[currentKelas+"_"+tgl] || "-";
             document.getElementById('print-periode').innerText = "TANGGAL: " + tgl + " (Pertemuan ke-" + pert + ")";
@@ -247,60 +367,3 @@
                 const st = absen[s.id] || "";
                 let bg=""; if(st=='H') bg='bg-h'; if(st=='S') bg='bg-s'; if(st=='I') bg='bg-i'; if(st=='A') bg='bg-a';
                 let badge = st ? `<span class="badge ${bg}">${st}</span>` : '-';
-                return `<tr><td class="text-center">${i+1}</td><td>${s.nama}</td><td class="text-center">${badge}</td><td>${getKet(st)}</td></tr>`;
-            }).join('');
-        }
-    }
-
-    function renderNilai() {
-        const siswaKelas = dataSiswa.filter(s => s.kelas === currentKelas);
-        const info = dbInfoTugas[currentKelas] || {};
-        ['t1','t2','t3','t4','t5'].forEach(k => { document.getElementById('info-'+k).value = info[k] || ""; });
-        document.getElementById('body-nilai').innerHTML = siswaKelas.map((s, i) => {
-            if(!s.n.t1) s.n.t1=0; if(!s.n.t2) s.n.t2=0; if(!s.n.t3) s.n.t3=0; if(!s.n.t4) s.n.t4=0; if(!s.n.t5) s.n.t5=0;
-            const n = s.n; const total = n.t1+n.t2+n.t3+n.t4+n.t5+n.uh1+n.uh2+n.uts+n.uas; const avg = (total / 9).toFixed(1);
-            return `<tr><td class="text-center">${i+1}</td><td>${s.nama}</td>
-            <td><input class="input-nilai" type="number" value="${n.t1}" onchange="saveN('${s.id}','t1',this.value)"></td>
-            <td><input class="input-nilai" type="number" value="${n.t2}" onchange="saveN('${s.id}','t2',this.value)"></td>
-            <td><input class="input-nilai" type="number" value="${n.t3}" onchange="saveN('${s.id}','t3',this.value)"></td>
-            <td><input class="input-nilai" type="number" value="${n.t4}" onchange="saveN('${s.id}','t4',this.value)"></td>
-            <td><input class="input-nilai" type="number" value="${n.t5}" onchange="saveN('${s.id}','t5',this.value)"></td>
-            <td><input class="input-nilai" type="number" value="${n.uh1}" onchange="saveN('${s.id}','uh1',this.value)"></td>
-            <td><input class="input-nilai" type="number" value="${n.uh2}" onchange="saveN('${s.id}','uh2',this.value)"></td>
-            <td><input class="input-nilai" type="number" value="${n.uts}" onchange="saveN('${s.id}','uts',this.value)"></td>
-            <td><input class="input-nilai" type="number" value="${n.uas}" onchange="saveN('${s.id}','uas',this.value)"></td>
-            <td class="text-center text-bold">${avg}</td></tr>`;
-        }).join('');
-    }
-
-    function renderPresensi() {
-        const tgl = document.getElementById('tgl-harian').value;
-        const keyJurnal = currentKelas + "_" + tgl;
-        document.getElementById('pertemuan-ke').value = dbJurnal[keyJurnal] || "1";
-        const siswaKelas = dataSiswa.filter(s => s.kelas === currentKelas);
-        const dataHari = dbAbsen[tgl] || {};
-        document.getElementById('body-presensi').innerHTML = siswaKelas.map((s, i) => {
-            const st = dataHari[s.id] || "";
-            let cls = ""; if(st=='H') cls='bg-h'; if(st=='S') cls='bg-s'; if(st=='I') cls='bg-i'; if(st=='A') cls='bg-a';
-            return `<tr><td class="text-center">${i+1}</td><td>${s.nama}</td>
-            <td><select class="status-select ${cls}" onchange="simpanAbsen('${s.id}', this.value)">
-                <option value="" ${st===''?'selected':''}>-</option><option value="H" ${st=='H'?'selected':''}>Hadir</option>
-                <option value="S" ${st=='S'?'selected':''}>Sakit</option><option value="I" ${st=='I'?'selected':''}>Izin</option>
-                <option value="A" ${st=='A'?'selected':''}>Alpha</option></select></td><td><small>${getKet(st)}</small></td></tr>`;
-        }).join('');
-    }
-
-    function simpanAbsen(id, val) { const tgl = document.getElementById('tgl-harian').value; if(!dbAbsen[tgl]) dbAbsen[tgl] = {}; dbAbsen[tgl][id] = val; localStorage.setItem('app_sman1_absen', JSON.stringify(dbAbsen)); renderPresensi(); }
-    function simpanJurnal() { const tgl = document.getElementById('tgl-harian').value; const val = document.getElementById('pertemuan-ke').value; const key = currentKelas + "_" + tgl; dbJurnal[key] = val; localStorage.setItem('app_sman1_jurnal', JSON.stringify(dbJurnal)); }
-    function saveN(id, col, val) { let s = dataSiswa.find(x => x.id === id); if(s) { s.n[col] = parseInt(val) || 0; localStorage.setItem('app_sman1_siswa', JSON.stringify(dataSiswa)); renderNilai(); } }
-    function simpanInfoTugas(col, val) { if(!dbInfoTugas[currentKelas]) dbInfoTugas[currentKelas] = {}; dbInfoTugas[currentKelas][col] = val; localStorage.setItem('app_sman1_infotugas', JSON.stringify(dbInfoTugas)); }
-    function exportExcel() { if(!currentKelas) return alert("Pilih kelas dulu!"); const table = document.getElementById('tabel-rekap'); const wb = XLSX.utils.table_to_book(table, {sheet: "Rekap"}); const mode = document.getElementById('mode-rekap').value; const periode = (mode==='bulanan') ? document.getElementById('filter-bulan').value : document.getElementById('filter-tanggal').value; const filename = "Rekap_" + currentKelas.replace(/ /g, '_') + "_" + periode + ".xlsx"; XLSX.writeFile(wb, filename); }
-    function sinkronisasi(alertMsg=true) { let count = 0; MASTER_SISWA.forEach(m => { const exist = dataSiswa.find(d => d.nama === m.nama && d.kelas === m.kelas); if(!exist) { dataSiswa.push({id: 'S'+Date.now()+Math.floor(Math.random()*999), nama: m.nama, kelas: m.kelas, n: {t1:0,t2:0,t3:0,t4:0,t5:0,uh1:0,uh2:0,uts:0,uas:0}}); count++; } }); localStorage.setItem('app_sman1_siswa', JSON.stringify(dataSiswa)); if(alertMsg) alert(count + " Siswa baru ditambahkan!"); document.getElementById('count-siswa').innerText = dataSiswa.length; initUI(); }
-    function resetAll() { if(confirm("Yakin hapus semua data?")) { localStorage.clear(); location.reload(); } }
-    function getKet(s) { if(s=='H') return 'Hadir'; if(s=='S') return 'Sakit'; if(s=='I') return 'Izin'; if(s=='A') return 'Alpha'; return ''; }
-    
-    document.getElementById('count-siswa').innerText = dataSiswa.length;
-</script>
-
-</body>
-</html>
