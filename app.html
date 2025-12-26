@@ -17,7 +17,7 @@
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); padding: 0; margin: 0; color: #333; display: flex; flex-direction: column; min-height: 100vh; }
         
         /* CONTAINER */
-        .container { max-width: 1200px; margin: 20px auto; background: var(--white); border-radius: 8px; box-shadow: 0 0 15px rgba(0,0,0,0.1); overflow: hidden; flex: 1; width: 95%; }
+        .container { max-width: 1250px; margin: 20px auto; background: var(--white); border-radius: 8px; box-shadow: 0 0 15px rgba(0,0,0,0.1); overflow: hidden; flex: 1; width: 95%; }
         
         /* HEADER SCREEN */
         .header { background: var(--primary); color: white; padding: 20px; text-align: center; }
@@ -41,23 +41,27 @@
         /* TOOLBAR */
         .toolbar { display: flex; gap: 15px; margin-bottom: 15px; background: #f8f9fa; padding: 15px; border-radius: 5px; border: 1px solid var(--border); flex-wrap: wrap; align-items: center; }
         
-        /* TABLES (SCREEN) */
+        /* TABLES */
         .table-wrap { overflow-x: auto; width: 100%; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; min-width: 800px; }
-        th, td { padding: 8px; border: 1px solid #dee2e6; text-align: left; vertical-align: middle; }
+        th, td { padding: 6px; border: 1px solid #dee2e6; text-align: left; vertical-align: middle; }
         th { background-color: #f1f3f5; font-weight: bold; text-align: center; }
         tr:nth-child(even) { background-color: #f8f9fa; }
+        
+        /* HELPER TEXT */
+        .text-center { text-align: center !important; }
+        .text-bold { font-weight: bold; }
         
         /* INPUTS */
         input.input-nilai { width: 40px; text-align: center; padding: 4px; border: 1px solid #ccc; border-radius: 3px; }
         input.input-header { width: 90%; font-size: 0.8rem; padding: 3px; margin-top: 5px; border: 1px solid #aaa; border-radius: 3px; text-align: center; background: #fff; color: #333; }
         
-        /* STATUS BADGE */
-        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; text-align: center; display: inline-block; }
-        .bg-h { background: var(--h); color: var(--ht); border: 1px solid #c3e6cb; }
-        .bg-s { background: var(--s); color: var(--st); border: 1px solid #ffeeba; }
-        .bg-i { background: var(--i); color: var(--it); border: 1px solid #b8daff; }
-        .bg-a { background: var(--a); color: var(--at); border: 1px solid #f5c6cb; }
+        /* STATUS BADGE & CELLS */
+        .status-cell { font-weight: bold; font-size: 0.85rem; }
+        .bg-h { background: var(--h); color: var(--ht); }
+        .bg-s { background: var(--s); color: var(--st); }
+        .bg-i { background: var(--i); color: var(--it); }
+        .bg-a { background: var(--a); color: var(--at); }
         
         select.status-select { padding: 5px; border-radius: 4px; width: 100%; cursor: pointer; }
         .hidden { display: none; }
@@ -73,18 +77,25 @@
         .footer { background: #343a40; color: #adb5bd; text-align: center; padding: 20px; font-size: 0.85rem; line-height: 1.6; margin-top: auto; border-top: 4px solid var(--primary); }
         .signature-block { display: none; } 
 
-        /* --- SETTINGAN CETAK (PRINT COMPACT) --- */
+        /* --- SETTINGAN CETAK (PRINT) --- */
         @media print {
-            @page { size: portrait; margin: 0.5cm 1cm; }
+            @page { size: landscape; margin: 1cm; } /* Rekomendasi Landscape agar tanggal muat */
             .header, .kelas-bar, .tabs, .toolbar, #tab-setting, .footer { display: none !important; }
             .container { box-shadow: none; max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
+            
             .table-wrap { overflow: visible; width: 100%; }
-            table { width: 100% !important; min-width: 0 !important; border: 1px solid #000; font-size: 10pt; }
-            th, td { border: 1px solid #000; padding: 3px 5px; color: #000; }
+            table { width: 100% !important; min-width: 0 !important; border: 1px solid #000; font-size: 9pt; }
+            th, td { border: 1px solid #000; padding: 3px; color: #000; }
+            
+            /* Warna Background saat Print */
+            .bg-h { background-color: #f0f0f0 !important; -webkit-print-color-adjust: exact; }
+            .bg-s { background-color: #fff3cd !important; -webkit-print-color-adjust: exact; }
+            .bg-a { background-color: #f8d7da !important; -webkit-print-color-adjust: exact; }
+
             .print-header { display: block !important; margin-bottom: 10px; font-weight: bold; text-align: center; font-size: 14pt; border-bottom: 2px solid #000; padding-bottom: 5px; }
             input.input-header, input.input-nilai { border: none; background: transparent; font-weight: bold; text-align: center; padding: 0; }
+            
             .signature-block { display: block !important; margin-top: 15px; float: right; width: 250px; text-align: center; page-break-inside: avoid; }
-            #tabel-rekap th:last-child, #tabel-rekap td:last-child { text-align: center !important; }
         }
         .print-header { display: none; }
     </style>
@@ -92,7 +103,6 @@
 <body>
 
 <script>
-    // PENGAMAN: Cek Login
     if(sessionStorage.getItem('sudah_login') !== 'ya') {
         alert("Anda harus login terlebih dahulu!");
         window.location.href = 'index.html';
@@ -305,12 +315,18 @@
 
         document.getElementById('body-presensi').innerHTML = siswaKelas.map((s, i) => {
             const st = dataHari[s.id] || "";
+            let colorClass = "";
+            if(st=='S') colorClass = "bg-s";
+            if(st=='I') colorClass = "bg-i";
+            if(st=='A') colorClass = "bg-a";
+            if(st=='H') colorClass = "bg-h";
+
             return `
             <tr>
                 <td style="text-align:center">${i+1}</td>
                 <td>${s.nama}</td>
                 <td>
-                    <select class="status-select ${getColor(st)}" onchange="simpanAbsen('${s.id}', this.value)">
+                    <select class="status-select ${colorClass}" onchange="simpanAbsen('${s.id}', this.value)">
                         <option value="" ${st===''?'selected':''}>-</option>
                         <option value="H" ${st=='H'?'selected':''}>Hadir</option>
                         <option value="S" ${st=='S'?'selected':''}>Sakit</option>
@@ -385,7 +401,7 @@
         localStorage.setItem('app_sman1_infotugas', JSON.stringify(dbInfoTugas));
     }
 
-    // --- LOGIC REKAP ---
+    // --- LOGIC REKAP (UPDATE MATRIKS) ---
     function toggleRekap() {
         const mode = document.getElementById('mode-rekap').value;
         if(mode==='bulanan') {
@@ -406,30 +422,83 @@
         const body = document.getElementById('body-rekap');
 
         if(mode === 'bulanan') {
-            const bln = document.getElementById('filter-bulan').value;
+            // --- MODE REKAP BULANAN (MATRIKS) ---
+            const bln = document.getElementById('filter-bulan').value; // YYYY-MM
             document.getElementById('print-periode').innerText = "PERIODE: " + bln;
-            head.innerHTML = `
+
+            // 1. Cari tanggal aktif di bulan ini
+            let dates = [];
+            Object.keys(dbAbsen).forEach(tgl => {
+                if(tgl.startsWith(bln)) {
+                    // Cek jika ada siswa di kelas ini yg punya data
+                    const adaData = siswa.some(s => dbAbsen[tgl][s.id]);
+                    if(adaData) dates.push(tgl);
+                }
+            });
+            dates.sort(); // Urutkan tanggal
+
+            // 2. Buat Header
+            let headerHTML = `
                 <tr>
-                    <th rowspan="2">No</th><th rowspan="2">Nama</th>
-                    <th colspan="4">Kehadiran</th><th rowspan="2">Predikat</th>
+                    <th rowspan="2" width="30px">No</th>
+                    <th rowspan="2" style="min-width:200px; text-align:left;">Nama Siswa</th>
+                    <th colspan="${dates.length > 0 ? dates.length : 1}">Tanggal / Pertemuan</th>
+                    <th colspan="4">Total</th>
                 </tr>
-                <tr><th>H</th><th>S</th><th>I</th><th>A</th></tr>
-            `;
+                <tr>`;
+            
+            if(dates.length === 0) {
+                headerHTML += `<th>-</th>`;
+            } else {
+                dates.forEach(tgl => {
+                    const keyJurnal = currentKelas + "_" + tgl;
+                    const pert = dbJurnal[keyJurnal] || "";
+                    const tglOnly = tgl.split('-')[2]; // Ambil DD
+                    const labelPert = pert ? `P-${pert}` : '';
+                    headerHTML += `<th class="text-center" style="min-width:35px;">${tglOnly}<br><small>${labelPert}</small></th>`;
+                });
+            }
+            headerHTML += `<th>H</th><th>S</th><th>I</th><th>A</th></tr>`;
+            head.innerHTML = headerHTML;
+
+            // 3. Buat Body
             body.innerHTML = siswa.map((s, i) => {
                 let h=0, sk=0, ij=0, al=0;
-                Object.keys(dbAbsen).forEach(k => {
-                    if(k.startsWith(bln)) {
-                        let st = dbAbsen[k][s.id];
-                        if(st=='H') h++; if(st=='S') sk++; if(st=='I') ij++; if(st=='A') al++;
-                    }
-                });
-                return `<tr><td style="text-align:center">${i+1}</td><td>${s.nama}</td>
-                <td style="text-align:center">${h}</td><td style="text-align:center">${sk}</td>
-                <td style="text-align:center">${ij}</td><td style="text-align:center; color:red">${al}</td>
-                <td style="text-align:center">${h>0?'Aktif':'-'}</td></tr>`;
+                let cols = "";
+
+                if(dates.length === 0) {
+                    cols = "<td class='text-center'>-</td>";
+                } else {
+                    dates.forEach(tgl => {
+                        const st = dbAbsen[tgl] ? (dbAbsen[tgl][s.id] || "") : "";
+                        if(st=='H') h++; 
+                        if(st=='S') sk++; 
+                        if(st=='I') ij++; 
+                        if(st=='A') al++;
+                        
+                        let bg = "";
+                        if(st=='S') bg = "bg-s";
+                        if(st=='I') bg = "bg-i";
+                        if(st=='A') bg = "bg-a";
+                        // Tampilkan simbol saja agar muat
+                        cols += `<td class="text-center ${bg} status-cell">${st}</td>`;
+                    });
+                }
+
+                return `
+                <tr>
+                    <td class="text-center">${i+1}</td>
+                    <td>${s.nama}</td>
+                    ${cols}
+                    <td class="text-center text-bold">${h}</td>
+                    <td class="text-center">${sk}</td>
+                    <td class="text-center">${ij}</td>
+                    <td class="text-center" style="color:red; font-weight:bold;">${al}</td>
+                </tr>`;
             }).join('');
 
         } else {
+            // --- MODE REKAP HARIAN (LAMA) ---
             const tgl = document.getElementById('filter-tanggal').value;
             const keyJurnal = currentKelas + "_" + tgl;
             const pert = dbJurnal[keyJurnal] || "-";
@@ -440,9 +509,15 @@
             
             body.innerHTML = siswa.map((s, i) => {
                 const st = absen[s.id] || "";
-                let badge = st ? `<span class="badge ${getColor(st)}">${st}</span>` : '-';
-                return `<tr><td style="text-align:center">${i+1}</td><td>${s.nama}</td>
-                <td style="text-align:center">${badge}</td><td>${getKet(st)}</td></tr>`;
+                let bg = "";
+                if(st=='H') bg = "bg-h";
+                if(st=='S') bg = "bg-s";
+                if(st=='I') bg = "bg-i";
+                if(st=='A') bg = "bg-a";
+
+                let badge = st ? `<span class="badge ${bg}">${st}</span>` : '-';
+                return `<tr><td class="text-center">${i+1}</td><td>${s.nama}</td>
+                <td class="text-center">${badge}</td><td>${getKet(st)}</td></tr>`;
             }).join('');
         }
     }
@@ -495,7 +570,6 @@
         XLSX.writeFile(wb, filename);
     }
 
-    function getColor(s) { if(s=='H') return 'bg-h'; if(s=='S') return 'bg-s'; if(s=='I') return 'bg-i'; if(s=='A') return 'bg-a'; return ''; }
     function getKet(s) { if(s=='H') return 'Hadir'; if(s=='S') return 'Sakit'; if(s=='I') return 'Izin'; if(s=='A') return 'Alpha'; return ''; }
     
     document.getElementById('count-siswa').innerText = dataSiswa.length;
