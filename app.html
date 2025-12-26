@@ -75,13 +75,18 @@
         .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; text-align: center; display: inline-block; }
 
         .hidden { display: none; }
-        .btn { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; color: white; }
+        .btn { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; color: white; display:inline-block; margin-right:5px;}
         .btn-green { background: #28a745; }
         .btn-print { background: #6c757d; }
         .btn-blue { background: #007bff; }
         .btn-red { background: #dc3545; }
+        .btn-orange { background: #fd7e14; color:white;}
+        
         .footer { background: #343a40; color: #adb5bd; text-align: center; padding: 20px; font-size: 0.85rem; line-height: 1.6; margin-top: auto; border-top: 4px solid var(--primary); }
         .signature-block { display: none; }
+
+        /* BOX BACKUP */
+        .backup-box { background: #fff3cd; border: 1px solid #ffeeba; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
 
         /* --- PRINT SETTINGS --- */
         @media print {
@@ -89,19 +94,12 @@
             .container { box-shadow: none; max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
             .table-wrap { overflow: visible; width: 100%; }
             table { width: 100% !important; min-width: 0 !important; border: 2px solid #000; }
-            
-            /* Border Cetak Lebih Tegas */
             th, td { border: 1px solid #000 !important; padding: 2px; color: #000; }
             
-            /* Header Cetak */
             .print-header { display: block !important; margin-bottom: 10px; font-weight: bold; text-align: center; font-size: 14pt; border-bottom: 2px solid #000; padding-bottom: 5px; }
-            
-            /* Tanda Tangan */
             .signature-block { display: block !important; margin-top: 15px; float: right; width: 250px; text-align: center; page-break-inside: avoid; }
-
             input.input-header, input.input-nilai { border: none; background: transparent; font-weight: bold; text-align: center; padding: 0; }
             
-            /* Warna Background di Print */
             .bg-h { background-color: #f0f0f0 !important; -webkit-print-color-adjust: exact; }
             .bg-s { background-color: #fff3cd !important; -webkit-print-color-adjust: exact; }
             .bg-a { background-color: #f8d7da !important; -webkit-print-color-adjust: exact; }
@@ -146,7 +144,7 @@
         <button class="tab-btn active" onclick="bukaTab('presensi')">📅 Presensi</button>
         <button class="tab-btn" onclick="bukaTab('nilai')">📝 Input Nilai</button>
         <button class="tab-btn" onclick="bukaTab('rekap')">📊 Rekap & Export</button>
-        <button class="tab-btn" onclick="bukaTab('setting')">⚙️ Setting</button>
+        <button class="tab-btn" onclick="bukaTab('setting')">⚙️ Setting & Backup</button>
         <button class="tab-btn" onclick="logout()" style="background:#dc3545; color:white;">🚪 Keluar</button>
     </div>
 
@@ -236,10 +234,26 @@
     </div>
 
     <div id="tab-setting" class="tab-content">
-        <h3>Database & Sinkronisasi</h3>
+        <h3>Manajemen Data & Keamanan</h3>
+        
+        <div class="backup-box">
+            <h4>💾 1. Backup Database (Simpan Data)</h4>
+            <p>Klik tombol ini secara rutin (misal seminggu sekali) untuk mendownload seluruh data presensi & nilai ke komputer/HP Anda. File ini adalah penyelamat jika browser terhapus.</p>
+            <button class="btn btn-green" onclick="backupData()">📥 Download Database (.json)</button>
+        </div>
+
+        <div class="backup-box" style="background:#e8f4fd; border-color:#b6d4fe;">
+            <h4>♻ 2. Restore Database (Kembalikan Data)</h4>
+            <p>Gunakan ini HANYA jika data Anda hilang. Upload file .json yang pernah Anda download sebelumnya.</p>
+            <input type="file" id="file-restore" accept=".json" style="margin-bottom:10px;">
+            <button class="btn btn-orange" onclick="restoreData()">📤 Upload & Pulihkan Data</button>
+        </div>
+
+        <hr>
+        <h4>3. Pengaturan Awal</h4>
         <p>Jumlah Siswa Terdaftar: <strong id="count-siswa">0</strong></p>
-        <button class="btn btn-blue" onclick="sinkronisasi()">🔄 Ambil Data Siswa (siswa.js)</button>
-        <br><br><button class="btn btn-red" onclick="resetAll()">⚠ Hapus Semua Data</button>
+        <button class="btn btn-blue" onclick="sinkronisasi()">🔄 Ambil Data Siswa (Reset Kelas)</button>
+        <button class="btn btn-red" onclick="resetAll()">⚠ Hapus Semua Data (Mulai Nol)</button>
     </div>
 
     <div class="footer">
@@ -260,7 +274,6 @@
     document.getElementById('tgl-harian').valueAsDate = new Date();
     document.getElementById('filter-bulan').value = new Date().toISOString().slice(0, 7);
     document.getElementById('filter-tanggal').valueAsDate = new Date();
-    
     const options = { day: 'numeric', month: 'long', year: 'numeric' };
     document.getElementById('tgl-cetak').innerText = new Date().toLocaleDateString('id-ID', options);
 
@@ -313,25 +326,18 @@
         const body = document.getElementById('body-rekap');
 
         if(mode === 'bulanan') {
-            // MODE MATRIKS BULANAN
             const bln = document.getElementById('filter-bulan').value;
             document.getElementById('print-periode').innerText = "PERIODE: " + bln;
-
-            // Cari tanggal yang ada isinya di bulan ini
             let dates = [];
-            Object.keys(dbAbsen).forEach(tgl => {
-                if(tgl.startsWith(bln) && siswa.some(s => dbAbsen[tgl][s.id])) dates.push(tgl);
-            });
+            Object.keys(dbAbsen).forEach(tgl => { if(tgl.startsWith(bln) && siswa.some(s => dbAbsen[tgl] && dbAbsen[tgl][s.id])) dates.push(tgl); });
             dates.sort();
 
             let hRow = `<tr><th rowspan="2" width="30px">No</th><th rowspan="2" style="min-width:200px;text-align:left;">Nama Siswa</th>`;
             if(dates.length > 0) {
                 dates.forEach(tgl => {
                     const pert = dbJurnal[currentKelas+"_"+tgl] || "";
-                    // FORMAT TANGGAL: DD/MM (Misal 05/12)
                     const parts = tgl.split('-');
-                    const tglFormat = parts[2] + '/' + parts[1];
-                    
+                    const tglFormat = parts[2] + '/' + parts[1]; // FORMAT BARU: DD/MM
                     hRow += `<th class="text-center cell-date" style="background:#fff">${tglFormat}<br><small style="font-size:0.6em; color:#666">${pert?'P-'+pert:''}</small></th>`;
                 });
             } else { hRow += `<th>-</th>`; }
@@ -346,18 +352,15 @@
                 if(dates.length === 0) cols = "<td class='text-center'>-</td>";
                 else {
                     dates.forEach(tgl => {
-                        const st = dbAbsen[tgl] ? (dbAbsen[tgl][s.id]||"") : "";
+                        const st = dbAbsen[tgl] ? (dbAbsen[tgl][s.id] || "") : "";
                         if(st=='H') h++; if(st=='S') sk++; if(st=='I') ij++; if(st=='A') al++;
-                        let bg=""; if(st=='S') bg='bg-s'; if(st=='I') bg='bg-i'; if(st=='A') bg='bg-a';
+                        let bg = ""; if(st=='S') bg="bg-s"; else if(st=='I') bg="bg-i"; else if(st=='A') bg="bg-a";
                         cols += `<td class="text-center ${bg} cell-status">${st}</td>`;
                     });
                 }
-                return `<tr><td class="text-center">${i+1}</td><td>${s.nama}</td>${cols}
-                <td class="text-center text-bold">${h}</td><td class="text-center">${sk}</td><td class="text-center">${ij}</td><td class="text-center" style="color:red;font-weight:bold;">${al}</td></tr>`;
+                return `<tr><td class="text-center">${i+1}</td><td>${s.nama}</td>${cols}<td class="text-center text-bold">${h}</td><td class="text-center">${sk}</td><td class="text-center">${ij}</td><td class="text-center" style="color:red; font-weight:bold;">${al}</td></tr>`;
             }).join('');
-
         } else {
-            // MODE HARIAN (KEMBALI KE ASAL)
             const tgl = document.getElementById('filter-tanggal').value;
             const pert = dbJurnal[currentKelas+"_"+tgl] || "-";
             document.getElementById('print-periode').innerText = "TANGGAL: " + tgl + " (Pertemuan ke-" + pert + ")";
@@ -419,6 +422,46 @@
     function resetAll() { if(confirm("Yakin hapus semua data?")) { localStorage.clear(); location.reload(); } }
     function getKet(s) { if(s=='H') return 'Hadir'; if(s=='S') return 'Sakit'; if(s=='I') return 'Izin'; if(s=='A') return 'Alpha'; return ''; }
     
+    // --- FITUR BACKUP & RESTORE ---
+    function backupData() {
+        const fullData = {
+            siswa: JSON.parse(localStorage.getItem('app_sman1_siswa')),
+            absen: JSON.parse(localStorage.getItem('app_sman1_absen')),
+            jurnal: JSON.parse(localStorage.getItem('app_sman1_jurnal')),
+            tugas: JSON.parse(localStorage.getItem('app_sman1_infotugas'))
+        };
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(fullData));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", "BACKUP_PRESENSI_SMAN1_" + new Date().toISOString().slice(0,10) + ".json");
+        document.body.appendChild(downloadAnchorNode);
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+    }
+
+    function restoreData() {
+        const input = document.getElementById('file-restore');
+        if (!input.files[0]) return alert("Pilih file .json backup dulu!");
+        
+        if(!confirm("PERINGATAN: Data yang ada sekarang akan ditimpa dengan data dari file backup. Lanjutkan?")) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                if(data.siswa) localStorage.setItem('app_sman1_siswa', JSON.stringify(data.siswa));
+                if(data.absen) localStorage.setItem('app_sman1_absen', JSON.stringify(data.absen));
+                if(data.jurnal) localStorage.setItem('app_sman1_jurnal', JSON.stringify(data.jurnal));
+                if(data.tugas) localStorage.setItem('app_sman1_infotugas', JSON.stringify(data.tugas));
+                alert("Data Berhasil Dipulihkan!");
+                location.reload();
+            } catch (err) {
+                alert("Gagal membaca file! Pastikan file backup benar.");
+            }
+        };
+        reader.readAsText(input.files[0]);
+    }
+
     document.getElementById('count-siswa').innerText = dataSiswa.length;
 </script>
 
