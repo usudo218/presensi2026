@@ -9,7 +9,7 @@
         :root { --primary: #0056b3; --bg: #f4f6f9; --white: #ffffff; --border: #ced4da; --h: #d4edda; --ht: #155724; --s: #fff3cd; --st: #856404; --i: #cce5ff; --it: #004085; --a: #f8d7da; --at: #721c24; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); padding: 0; margin: 0; color: #333; display: flex; flex-direction: column; min-height: 100vh; }
         
-        /* LAYOUT */
+        /* CONTAINER & HEADER */
         .container { max-width: 1250px; margin: 20px auto; background: var(--white); border-radius: 8px; box-shadow: 0 0 15px rgba(0,0,0,0.1); overflow: hidden; flex: 1; width: 95%; }
         .header { background: var(--primary); color: white; padding: 20px; text-align: center; }
         .header h1 { margin: 0; font-size: 1.5rem; } .header p { margin: 5px 0 0; font-size: 0.9rem; opacity: 0.9; }
@@ -24,25 +24,27 @@
         .tab-content { padding: 20px; display: none; }
         .tab-content.active { display: block; }
 
-        /* UTILS */
+        /* TOOLS & TABLE */
         .toolbar { display: flex; gap: 15px; margin-bottom: 15px; background: #f8f9fa; padding: 15px; border-radius: 5px; border: 1px solid var(--border); flex-wrap: wrap; align-items: center; }
         .table-wrap { overflow-x: auto; width: 100%; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; min-width: 800px; }
-        th, td { padding: 5px; border: 1px solid #dee2e6; text-align: left; vertical-align: middle; }
-        th { background-color: #f1f3f5; font-weight: bold; text-align: center; }
+        th, td { padding: 8px; border: 1px solid #dee2e6; text-align: left; vertical-align: top; }
+        th { background-color: #f1f3f5; font-weight: bold; text-align: center; vertical-align: middle; }
         tr:nth-child(even) { background-color: #f8f9fa; }
+        
+        /* UTILS */
         .hidden { display: none; }
         .btn { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; color: white; margin-right:5px; }
         .btn-green { background: #28a745; } .btn-print { background: #6c757d; } .btn-blue { background: #007bff; } .btn-red { background: #dc3545; }
         .footer { background: #343a40; color: #adb5bd; text-align: center; padding: 20px; font-size: 0.85rem; margin-top: auto; border-top: 4px solid var(--primary); }
 
-        /* STYLING JURNAL */
+        /* JURNAL INPUT */
         .jurnal-form { display: flex; flex-direction: column; gap: 15px; max-width: 800px; margin: 0 auto; }
         .form-group label { font-weight: bold; display: block; margin-bottom: 5px; }
         .form-group textarea, .form-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-family: inherit; }
         .form-group textarea { height: 100px; resize: vertical; }
 
-        /* STYLING MATERI (GRID THUMBNAIL) */
+        /* GRID MATERI */
         .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; margin-top: 20px; }
         .card-materi { background: white; border: 1px solid #ddd; border-radius: 8px; padding: 20px; text-align: center; transition: 0.3s; cursor: pointer; text-decoration: none; color: #333; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 150px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .card-materi:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-color: var(--primary); }
@@ -50,19 +52,35 @@
         .card-title { font-weight: bold; font-size: 1rem; }
         .section-title { border-bottom: 2px solid #ddd; padding-bottom: 5px; margin-top: 30px; margin-bottom: 15px; color: var(--primary); }
 
-        /* PRINT */
+        /* PRINT STYLE (PENTING) */
         @media print { 
             .header, .kelas-bar, .tabs, .toolbar, #tab-setting, .footer { display: none !important; } 
-            .container { box-shadow: none; max-width: 100% !important; margin: 0 !important; } 
+            .container { box-shadow: none; max-width: 100% !important; margin: 0 !important; width: 100%; padding: 0; } 
             .table-wrap { overflow: visible; } 
-            table { width: 100%; border: 2px solid #000; } th, td { border: 1px solid #000 !important; }
-            .print-header { display: block !important; margin-bottom: 10px; font-weight: bold; text-align: center; font-size: 14pt; border-bottom: 2px solid #000; padding-bottom: 5px; } 
-            .signature-block { display: block !important; margin-top: 20px; float: right; width: 250px; text-align: center; page-break-inside: avoid; } 
-        } .print-header, .signature-block { display: none; }
+            
+            /* TABEL HITAM TEGAS */
+            table { width: 100%; border: 2px solid #000; border-collapse: collapse; font-size: 10pt; } 
+            th, td { border: 1px solid #000 !important; color: #000; padding: 5px; }
+            th { background-color: #eee !important; -webkit-print-color-adjust: exact; }
+            
+            /* HEADER CETAK (KOP SURAT SEDERHANA) */
+            .print-header { display: block !important; margin-bottom: 20px; text-align: center; border-bottom: 3px double #000; padding-bottom: 10px; }
+            .ph-title { font-size: 14pt; font-weight: bold; text-transform: uppercase; }
+            .ph-sub { font-size: 11pt; }
+
+            /* FOOTER TANDA TANGAN */
+            .signature-block { display: block !important; margin-top: 30px; float: right; width: 250px; text-align: center; page-break-inside: avoid; }
+            
+            /* JIKA CETAK JURNAL -> LANDSCAPE */
+            .page-jurnal { size: landscape; }
+            @page { margin: 1.5cm; }
+        } 
+        .print-header, .signature-block { display: none; }
         
-        /* MODIFIKASI TAMPILAN */
+        /* STYLE KHUSUS */
         .bg-h { background: var(--h); } .bg-s { background: var(--s); } .bg-i { background: var(--i); } .bg-a { background: var(--a); }
         input.input-nilai { width: 40px; text-align: center; } input.input-header { width: 90%; text-align: center; }
+        .text-center { text-align: center; } .text-bold { font-weight: bold; }
     </style>
 </head>
 <body>
@@ -73,6 +91,7 @@
 
 <div class="container">
     <div class="header"><h1>APLIKASI PRESENSI SMAN 1 MUNCAR</h1><p>Sistem Pencatatan Kehadiran & Penilaian Siswa Digital</p></div>
+    
     <div class="kelas-bar">
         <div class="kelas-selector"><label>📂 Pilih Kelas: </label><select id="pilih-kelas" onchange="gantiKelas()"><option value="">-- Pilih --</option></select></div>
         <strong id="info-kelas" style="color:#555;"></strong>
@@ -80,8 +99,10 @@
     
     <div class="tabs">
         <button class="tab-btn active" onclick="bukaTab('presensi')">📅 Presensi</button>
-        <button class="tab-btn" onclick="bukaTab('jurnal')">📖 Jurnal Mengajar</button> <button class="tab-btn" onclick="bukaTab('nilai')">📝 Input Nilai</button>
-        <button class="tab-btn" onclick="bukaTab('materi')">📚 Materi & Tugas</button> <button class="tab-btn" onclick="bukaTab('rekap')">📊 Rekap</button>
+        <button class="tab-btn" onclick="bukaTab('jurnal')">📖 Jurnal Mengajar</button>
+        <button class="tab-btn" onclick="bukaTab('nilai')">📝 Input Nilai</button>
+        <button class="tab-btn" onclick="bukaTab('materi')">📚 Materi & Tugas</button>
+        <button class="tab-btn" onclick="bukaTab('rekap')">📊 Rekap</button>
         <button class="tab-btn" onclick="bukaTab('setting')">☁️ Cloud Sync</button>
         <button class="tab-btn" onclick="logout()" style="background:#dc3545; color:white;">🚪 Keluar</button>
     </div>
@@ -96,21 +117,11 @@
 
     <div id="tab-jurnal" class="tab-content">
         <h3 style="text-align:center; color:var(--primary); border-bottom:2px solid #ddd; padding-bottom:10px;">JURNAL KEGIATAN BELAJAR MENGAJAR</h3>
-        <p style="text-align:center; color:#666; margin-bottom:20px;">Silakan isi jurnal harian setelah melakukan presensi.</p>
-        
+        <p style="text-align:center; color:#666; margin-bottom:20px;">Isi jurnal untuk tanggal: <strong id="lbl-tgl-jurnal"></strong></p>
         <div class="jurnal-form">
-            <div class="form-group">
-                <label>Materi / Topik Pembelajaran:</label>
-                <textarea id="jurnal-materi" placeholder="Contoh: Algoritma Pemrograman Dasar, Looping, dan Array..." onchange="simpanJurnalGuru()"></textarea>
-            </div>
-            <div class="form-group">
-                <label>Aktivitas / Metode:</label>
-                <input type="text" id="jurnal-aktivitas" placeholder="Contoh: Diskusi Kelompok, Praktikum Lab..." onchange="simpanJurnalGuru()">
-            </div>
-            <div class="form-group">
-                <label>Catatan / Kendala Kelas:</label>
-                <textarea id="jurnal-catatan" placeholder="Contoh: Siswa antusias, namun kendala di koneksi internet lab..." onchange="simpanJurnalGuru()"></textarea>
-            </div>
+            <div class="form-group"><label>Materi / Topik Pembelajaran:</label><textarea id="jurnal-materi" placeholder="Isi materi..." onchange="simpanJurnalGuru()"></textarea></div>
+            <div class="form-group"><label>Aktivitas / Metode:</label><input type="text" id="jurnal-aktivitas" placeholder="Metode..." onchange="simpanJurnalGuru()"></div>
+            <div class="form-group"><label>Catatan / Kendala:</label><textarea id="jurnal-catatan" placeholder="Catatan..." onchange="simpanJurnalGuru()"></textarea></div>
             <div style="text-align:right; font-size:0.9rem; color:green;" id="status-jurnal"></div>
         </div>
     </div>
@@ -122,84 +133,103 @@
 
     <div id="tab-materi" class="tab-content">
         <p style="background:#fff3cd; padding:10px; border:1px solid #ffeeba; border-radius:5px;">ℹ️ <strong>Info:</strong> Klik pada kartu untuk membuka folder/file di Google Drive.</p>
-
         <h3 class="section-title">📂 Modul Ajar Informatika</h3>
         <div class="grid-container">
-            <a href="https://drive.google.com/drive/u/0/" target="_blank" class="card-materi">
-                <div class="card-icon">📘</div><div class="card-title">Modul Semester 1</div>
-            </a>
-            <a href="https://drive.google.com/drive/u/0/" target="_blank" class="card-materi">
-                <div class="card-icon">📙</div><div class="card-title">Modul Semester 2</div>
-            </a>
-            
+            <a href="https://drive.google.com/drive/u/0/" target="_blank" class="card-materi"><div class="card-icon">📘</div><div class="card-title">Modul Semester 1</div></a>
+            <a href="https://drive.google.com/drive/u/0/" target="_blank" class="card-materi"><div class="card-icon">📙</div><div class="card-title">Modul Semester 2</div></a>
         </div>
-
         <h3 class="section-title">📽️ Materi Pembelajaran Informatika</h3>
         <div class="grid-container">
-            <a href="https://drive.google.com/drive/u/0/" target="_blank" class="card-materi">
-                <div class="card-icon">📄</div><div class="card-title">Slide Presentasi (PPT)</div>
-            </a>
-            <a href="https://youtube.com" target="_blank" class="card-materi">
-                <div class="card-icon">▶️</div><div class="card-title">Video Pembelajaran</div>
-            </a>
-            <a href="https://drive.google.com/drive/u/0/" target="_blank" class="card-materi">
-                <div class="card-icon">💾</div><div class="card-title">Software Pendukung</div>
-            </a>
+            <a href="https://drive.google.com/drive/u/0/" target="_blank" class="card-materi"><div class="card-icon">📄</div><div class="card-title">Slide Presentasi (PPT)</div></a>
+            <a href="https://youtube.com" target="_blank" class="card-materi"><div class="card-icon">▶️</div><div class="card-title">Video Pembelajaran</div></a>
+            <a href="https://drive.google.com/drive/u/0/" target="_blank" class="card-materi"><div class="card-icon">💾</div><div class="card-title">Software Pendukung</div></a>
         </div>
-
         <h3 class="section-title">📝 Tugas & Proyek</h3>
         <div class="grid-container">
-            <a href="https://drive.google.com/drive/u/0/" target="_blank" class="card-materi">
-                <div class="card-icon">📂</div><div class="card-title">Bank Soal</div>
-            </a>
-            <a href="https://drive.google.com/drive/u/0/" target="_blank" class="card-materi">
-                <div class="card-icon">📤</div><div class="card-title">Folder Pengumpulan Tugas</div>
-            </a>
+            <a href="https://drive.google.com/drive/u/0/" target="_blank" class="card-materi"><div class="card-icon">📂</div><div class="card-title">Bank Soal</div></a>
+            <a href="https://drive.google.com/drive/u/0/" target="_blank" class="card-materi"><div class="card-icon">📤</div><div class="card-title">Folder Pengumpulan Tugas</div></a>
         </div>
     </div>
 
     <div id="tab-rekap" class="tab-content">
         <div class="toolbar">
-            <select id="mode-rekap" onchange="toggleRekap()" style="padding:8px;"><option value="bulanan">🗓 Rekap Bulanan</option><option value="harian">📆 Rekap Harian</option><option value="nilai">📝 Rekap Nilai</option></select>
-            <div id="filter-wrapper" style="display:inline-block;"><input type="month" id="filter-bulan" onchange="renderRekap()"><input type="date" id="filter-tanggal" class="hidden" onchange="renderRekap()"></div>
-            <div style="margin-left:auto;"><button class="btn btn-green" onclick="exportExcel()">📥 Excel</button><button class="btn btn-print" onclick="window.print()">🖨 Cetak</button></div>
+            <label>Mode:</label>
+            <select id="mode-rekap" onchange="toggleRekap()" style="padding:8px; font-weight:bold;">
+                <option value="bulanan">🗓 Rekap Presensi (Matriks)</option>
+                <option value="harian">📆 Rekap Presensi (Harian)</option>
+                <option value="nilai">📝 Rekap Nilai (Semester)</option>
+                <option value="jurnal">📖 Rekap Jurnal Mengajar</option>
+            </select>
+            
+            <div id="filter-wrapper" style="display:inline-block;">
+                <input type="month" id="filter-bulan" onchange="renderRekap()">
+                <input type="date" id="filter-tanggal" class="hidden" onchange="renderRekap()">
+            </div>
+            
+            <div style="margin-left:auto;">
+                <button class="btn btn-green" onclick="exportExcel()">📥 Excel</button>
+                <button class="btn btn-print" onclick="window.print()">🖨 Cetak</button>
+            </div>
         </div>
-        <div class="print-header"><span id="judul-rekap">REKAPITULASI PRESENSI</span> KELAS <span id="print-kelas"></span><br><small id="print-periode" style="font-weight:normal"></small></div>
-        <div class="table-wrap"><table id="tabel-rekap"><thead id="head-rekap"></thead><tbody id="body-rekap"></tbody></table></div>
-        <div class="signature-block">Muncar, <span id="tgl-cetak"></span><br>Guru Mata Pelajaran<br><br><br><br><strong><u>Agus Suyatno, S.Kom</u></strong><br>NIP. 19730213 202521 1 032</div>
+
+        <div class="print-header">
+            <div class="ph-title">PEMERINTAH PROVINSI JAWA TIMUR</div>
+            <div class="ph-title">DINAS PENDIDIKAN</div>
+            <div class="ph-title">SMAN 1 MUNCAR</div>
+            <div class="ph-sub">Jalan Tapanrejo, Muncar, Banyuwangi</div>
+            <hr style="border:1px solid black; margin:10px 0;">
+            <div style="margin-top:10px;">
+                <span id="judul-rekap" style="font-weight:bold; font-size:1.2rem; text-decoration:underline;">REKAPITULASI</span><br>
+                Kelas: <span id="print-kelas"></span> | <span id="print-periode"></span>
+            </div>
+        </div>
+
+        <div class="table-wrap">
+            <table id="tabel-rekap">
+                <thead id="head-rekap"></thead>
+                <tbody id="body-rekap"></tbody>
+            </table>
+        </div>
+
+        <div class="signature-block">
+            Muncar, <span id="tgl-cetak"></span><br>
+            Guru Mata Pelajaran<br>
+            <br><br><br><br>
+            <strong><u>Agus Suyatno, S.Kom</u></strong><br>
+            NIP. 19730213 202521 1 032
+        </div>
     </div>
 
     <div id="tab-setting" class="tab-content">
         <h3>☁️ Sinkronisasi Cloud</h3>
-        <p>Data Jurnal, Presensi, dan Nilai akan tersimpan di Google Sheet.</p>
+        <p>Sinkronkan data secara berkala agar tidak hilang.</p>
         <div class="cloud-box">
-            <h4>1. Simpan ke Cloud (Upload)</h4>
-            <button class="btn btn-blue" id="btn-upload" onclick="uploadToCloud()">☁️ Simpan Data</button> <span id="status-upload" class="cloud-status"></span>
+            <h4>1. Upload ke Cloud</h4><button class="btn btn-blue" id="btn-upload" onclick="uploadToCloud()">☁️ Simpan Data</button> <span id="status-upload" class="cloud-status"></span>
         </div>
         <div class="cloud-box" style="background:#d1e7dd; border-color:#badbcc;">
-            <h4>2. Ambil dari Cloud (Download)</h4>
-            <button class="btn btn-green" id="btn-download" onclick="downloadFromCloud()">⬇️ Ambil Data</button> <span id="status-download" class="cloud-status"></span>
+            <h4>2. Download dari Cloud</h4><button class="btn btn-green" id="btn-download" onclick="downloadFromCloud()">⬇️ Ambil Data</button> <span id="status-download" class="cloud-status"></span>
         </div>
-        <hr><button class="btn btn-red" onclick="resetAll()">⚠ Reset Data Lokal</button>
+        <hr><button class="btn btn-red" onclick="resetAll()">⚠ Reset Data</button>
     </div>
 
     <div class="footer">© 2025 usudo.id | Guru Informatika</div>
 </div>
+
 <script src="siswa.js"></script>
 <script>
-    // --- MASUKKAN URL GOOGLE SCRIPT ANDA DI SINI ---
+    // --- URL GOOGLE SCRIPT SUDAH DIPASANG OTOMATIS ---
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwGI1pYUKGg4St3hxNtLD5goe5bJ0F1JKFFguzKIPP9Ro5yaF542FE0t5iwQlj0XDtY/exec"; 
-    // -----------------------------------------------
+    // --------------------------------
 
     const MASTER_SISWA = (typeof SISWA_BARU !== 'undefined') ? SISWA_BARU : [];
     let dataSiswa = JSON.parse(localStorage.getItem('app_sman1_siswa')) || [];
     let dbAbsen = JSON.parse(localStorage.getItem('app_sman1_absen')) || {}; 
     let dbJurnal = JSON.parse(localStorage.getItem('app_sman1_jurnal')) || {}; 
     let dbInfoTugas = JSON.parse(localStorage.getItem('app_sman1_infotugas')) || {};
-    let dbJurnalGuru = JSON.parse(localStorage.getItem('app_sman1_jurnalguru')) || {}; // DATABASE BARU UNTUK JURNAL TEKS
+    let dbJurnalGuru = JSON.parse(localStorage.getItem('app_sman1_jurnalguru')) || {};
     let currentKelas = localStorage.getItem('last_kelas') || "";
 
-    // INIT DATE
+    // INIT
     document.getElementById('tgl-harian').valueAsDate = new Date();
     document.getElementById('filter-bulan').value = new Date().toISOString().slice(0, 7);
     document.getElementById('filter-tanggal').valueAsDate = new Date();
@@ -224,7 +254,11 @@
         document.getElementById('msg-empty').style.display = isHidden ? 'block' : 'none';
         document.getElementById('info-kelas').innerText = currentKelas;
         document.getElementById('print-kelas').innerText = currentKelas;
-        if(currentKelas) { renderPresensi(); renderNilai(); renderRekap(); renderJurnal(); }
+        
+        if(currentKelas) { 
+            renderPresensi(); renderNilai(); renderRekap(); renderJurnal(); 
+            document.getElementById('lbl-tgl-jurnal').innerText = document.getElementById('tgl-harian').value;
+        }
     }
 
     function bukaTab(id) {
@@ -240,77 +274,187 @@
         }
     }
 
-    // --- LOGIC JURNAL MENGAJAR (BARU) ---
+    // --- REKAP LOGIC (UPDATED) ---
+    function toggleRekap() {
+        const mode = document.getElementById('mode-rekap').value;
+        const fw = document.getElementById('filter-wrapper');
+        const fb = document.getElementById('filter-bulan');
+        const ft = document.getElementById('filter-tanggal');
+        
+        // Atur Halaman Cetak (Landscape untuk Jurnal)
+        const styleSheet = document.styleSheets[0];
+        if(mode === 'jurnal') {
+             // Inject style for landscape
+             document.querySelector('style').innerHTML += "@media print { @page { size: landscape; } }";
+        } else {
+             // Reset to portrait default or handle in CSS
+        }
+
+        if(mode==='bulanan' || mode==='jurnal') {
+            fw.style.display='inline-block'; fb.classList.remove('hidden'); ft.classList.add('hidden');
+        } else if (mode === 'harian') {
+            fw.style.display='inline-block'; fb.classList.add('hidden'); ft.classList.remove('hidden');
+        } else {
+            fw.style.display='none';
+        }
+        renderRekap();
+    }
+
+    function renderRekap() {
+        if(!currentKelas) return;
+        const mode = document.getElementById('mode-rekap').value;
+        const head = document.getElementById('head-rekap');
+        const body = document.getElementById('body-rekap');
+        const siswa = dataSiswa.filter(s => s.kelas === currentKelas);
+
+        // 1. REKAP JURNAL MENGAJAR (BARU & RAPI)
+        if (mode === 'jurnal') {
+            const bln = document.getElementById('filter-bulan').value;
+            document.getElementById('judul-rekap').innerText = "JURNAL KEGIATAN BELAJAR MENGAJAR";
+            document.getElementById('print-periode').innerText = "BULAN: " + bln;
+
+            head.innerHTML = `
+                <tr>
+                    <th width="5%">No</th>
+                    <th width="15%">Hari / Tanggal</th>
+                    <th width="8%">Pert. Ke</th>
+                    <th width="30%">Materi / Topik Pembelajaran</th>
+                    <th width="20%">Aktivitas / Metode</th>
+                    <th width="22%">Catatan / Kendala</th>
+                </tr>`;
+
+            // Cari data jurnal yang sesuai bulan & kelas
+            let records = [];
+            Object.keys(dbJurnalGuru).forEach(key => { // Key: KELAS_YYYY-MM-DD
+                const parts = key.split('_');
+                const kls = parts[0];
+                const tgl = parts[1];
+                if (kls === currentKelas && tgl.startsWith(bln)) {
+                    records.push({ tgl: tgl, ...dbJurnalGuru[key], pert: dbJurnal[key]||'-' });
+                }
+            });
+            records.sort((a,b) => a.tgl.localeCompare(b.tgl));
+
+            if(records.length === 0) {
+                body.innerHTML = `<tr><td colspan="6" class="text-center" style="padding:20px;">Belum ada data jurnal untuk bulan ini.</td></tr>`;
+            } else {
+                body.innerHTML = records.map((r, i) => {
+                    const dateObj = new Date(r.tgl);
+                    const days = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+                    const dayName = days[dateObj.getDay()];
+                    const dateIndo = r.tgl.split('-').reverse().join('-');
+                    
+                    return `<tr>
+                        <td class="text-center">${i+1}</td>
+                        <td class="text-center">${dayName}, ${dateIndo}</td>
+                        <td class="text-center">${r.pert}</td>
+                        <td style="text-align:justify;">${r.materi}</td>
+                        <td>${r.aktivitas}</td>
+                        <td>${r.catatan}</td>
+                    </tr>`;
+                }).join('');
+            }
+        }
+        // 2. REKAP BULANAN (MATRIKS)
+        else if(mode === 'bulanan') {
+            const bln = document.getElementById('filter-bulan').value;
+            document.getElementById('judul-rekap').innerText = "REKAPITULASI PRESENSI";
+            document.getElementById('print-periode').innerText = "BULAN: " + bln;
+            
+            let dates = [];
+            Object.keys(dbAbsen).forEach(tgl => { if(tgl.startsWith(bln) && siswa.some(s => dbAbsen[tgl] && dbAbsen[tgl][s.id])) dates.push(tgl); });
+            dates.sort();
+            
+            let h = `<tr><th rowspan="2" width="30px">No</th><th rowspan="2" style="min-width:200px;">Nama Siswa</th>`;
+            dates.forEach(tgl => {
+                 const p = dbJurnal[currentKelas+"_"+tgl]||""; 
+                 h+=`<th class="text-center" style="font-size:0.8rem">${tgl.split('-')[2]}/${tgl.split('-')[1]}<br><small>P${p}</small></th>`;
+            });
+            h+= `<th colspan="4">Total</th></tr><tr>`;
+            dates.forEach(()=>h+=`<th></th>`);
+            h+= `<th>H</th><th>S</th><th>I</th><th>A</th></tr>`;
+            head.innerHTML = h;
+
+            body.innerHTML = siswa.map((s,i) => {
+                let cnt={H:0,S:0,I:0,A:0}, cols="";
+                dates.forEach(tgl => {
+                    const st = dbAbsen[tgl] ? (dbAbsen[tgl][s.id]||"") : "";
+                    if(st) cnt[st]++;
+                    cols += `<td class="text-center text-bold ${st=='S'?'bg-s':st=='I'?'bg-i':st=='A'?'bg-a':''}">${st}</td>`;
+                });
+                return `<tr><td class="text-center">${i+1}</td><td>${s.nama}</td>${cols}<td class="text-center">${cnt.H}</td><td class="text-center">${cnt.S}</td><td class="text-center">${cnt.I}</td><td class="text-center" style="color:red;">${cnt.A}</td></tr>`;
+            }).join('');
+        }
+        // 3. REKAP HARIAN
+        else if (mode === 'harian') {
+            const tgl = document.getElementById('filter-tanggal').value;
+            document.getElementById('judul-rekap').innerText = "PRESENSI HARIAN";
+            document.getElementById('print-periode').innerText = "TANGGAL: " + tgl;
+            head.innerHTML = `<tr><th>No</th><th>Nama Siswa</th><th>Status</th><th>Keterangan</th></tr>`;
+            const absen = dbAbsen[tgl] || {};
+            body.innerHTML = siswa.map((s,i) => {
+                const st = absen[s.id] || "";
+                return `<tr><td class="text-center">${i+1}</td><td>${s.nama}</td><td class="text-center text-bold">${st}</td><td>${getKet(st)}</td></tr>`;
+            }).join('');
+        }
+        // 4. REKAP NILAI
+        else {
+            document.getElementById('judul-rekap').innerText = "DAFTAR NILAI SISWA";
+            document.getElementById('print-periode').innerText = "SEMESTER INI";
+            head.innerHTML = `<tr><th rowspan="2">No</th><th rowspan="2">Nama</th><th colspan="5">Tugas</th><th colspan="2">UH</th><th rowspan="2">UTS</th><th rowspan="2">UAS</th><th rowspan="2">Rata</th></tr><tr><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>1</th><th>2</th></tr>`;
+            body.innerHTML = siswa.map((s,i) => {
+                const n = s.n; const tot = n.t1+n.t2+n.t3+n.t4+n.t5+n.uh1+n.uh2+n.uts+n.uas;
+                return `<tr><td class="text-center">${i+1}</td><td>${s.nama}</td><td class="text-center">${n.t1}</td><td class="text-center">${n.t2}</td><td class="text-center">${n.t3}</td><td class="text-center">${n.t4}</td><td class="text-center">${n.t5}</td><td class="text-center">${n.uh1}</td><td class="text-center">${n.uh2}</td><td class="text-center">${n.uts}</td><td class="text-center">${n.uas}</td><td class="text-center text-bold">${(tot/9).toFixed(1)}</td></tr>`;
+            }).join('');
+        }
+    }
+
+    // --- JURNAL & CLOUD FUNCTIONS ---
     function renderJurnal() {
         const tgl = document.getElementById('tgl-harian').value;
         const key = currentKelas + "_" + tgl;
         const data = dbJurnalGuru[key] || {materi:'', aktivitas:'', catatan:''};
-        
         document.getElementById('jurnal-materi').value = data.materi;
         document.getElementById('jurnal-aktivitas').value = data.aktivitas;
         document.getElementById('jurnal-catatan').value = data.catatan;
         document.getElementById('status-jurnal').innerText = "";
     }
-
     function simpanJurnalGuru() {
-        if(!currentKelas) return alert("Pilih kelas dulu!");
         const tgl = document.getElementById('tgl-harian').value;
-        const key = currentKelas + "_" + tgl;
-        
-        dbJurnalGuru[key] = {
+        dbJurnalGuru[currentKelas+"_"+tgl] = {
             materi: document.getElementById('jurnal-materi').value,
             aktivitas: document.getElementById('jurnal-aktivitas').value,
             catatan: document.getElementById('jurnal-catatan').value
         };
         localStorage.setItem('app_sman1_jurnalguru', JSON.stringify(dbJurnalGuru));
-        document.getElementById('status-jurnal').innerText = "Simpan Jurnal di Lokal: OK";
+        document.getElementById('status-jurnal').innerText = "Simpan OK";
     }
 
-    // --- CLOUD SYNC ---
     function uploadToCloud() {
-        if(GOOGLE_SCRIPT_URL.includes("ISI_URL")) return alert("Harap pasang URL Google Script!");
-        const btn = document.getElementById('btn-upload');
-        const stat = document.getElementById('status-upload');
-        btn.disabled = true; btn.innerText = "⏳ Mengirim..."; stat.innerText = "";
-
-        // TAMBAHKAN dbJurnalGuru ke payload
-        const payload = { action: 'simpan', data: { siswa: dataSiswa, absen: dbAbsen, jurnal: dbJurnal, tugas: dbInfoTugas, jurnalGuru: dbJurnalGuru } };
-
-        fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) })
-        .then(res => res.json())
-        .then(res => {
-            btn.disabled = false; btn.innerText = "☁️ Simpan Data";
-            if(res.status === 'sukses') { stat.innerText = "✅ Sukses!"; stat.style.color = "green"; alert("Tersimpan di Cloud!"); }
-        })
-        .catch(err => { btn.disabled = false; btn.innerText = "☁️ Simpan Data"; stat.innerText = "❌ Gagal."; stat.style.color = "red"; });
+        if(GOOGLE_SCRIPT_URL.includes("ISI_URL")) return alert("Link Google Script belum dipasang!");
+        const btn=document.getElementById('btn-upload'); btn.innerText="⏳ Sending..."; btn.disabled=true;
+        fetch(GOOGLE_SCRIPT_URL, { method:'POST', body:JSON.stringify({action:'simpan', data:{siswa:dataSiswa, absen:dbAbsen, jurnal:dbJurnal, tugas:dbInfoTugas, jurnalGuru:dbJurnalGuru}}) })
+        .then(res=>res.json()).then(r=>{ btn.innerText="☁️ Simpan Data"; btn.disabled=false; alert("Sukses tersimpan di Cloud!"); })
+        .catch(e=>{ btn.innerText="☁️ Simpan Data"; btn.disabled=false; alert("Gagal koneksi."); });
     }
 
     function downloadFromCloud() {
-        if(GOOGLE_SCRIPT_URL.includes("ISI_URL")) return alert("Harap pasang URL Google Script!");
-        if(!confirm("Data di HP ini akan ditimpa. Lanjutkan?")) return;
-        const btn = document.getElementById('btn-download');
-        const stat = document.getElementById('status-download');
-        btn.disabled = true; btn.innerText = "⏳ Mengambil...";
-
-        fetch(GOOGLE_SCRIPT_URL)
-        .then(res => res.json())
-        .then(res => {
-            if(res.siswa) {
-                dataSiswa = res.siswa; localStorage.setItem('app_sman1_siswa', JSON.stringify(dataSiswa));
-                dbAbsen = res.absen || {}; localStorage.setItem('app_sman1_absen', JSON.stringify(dbAbsen));
-                dbJurnal = res.jurnal || {}; localStorage.setItem('app_sman1_jurnal', JSON.stringify(dbJurnal));
-                dbInfoTugas = res.tugas || {}; localStorage.setItem('app_sman1_infotugas', JSON.stringify(dbInfoTugas));
-                // Restore Jurnal Guru
-                dbJurnalGuru = res.jurnalGuru || {}; localStorage.setItem('app_sman1_jurnalguru', JSON.stringify(dbJurnalGuru));
-                
-                btn.disabled = false; btn.innerText = "⬇️ Ambil Data";
-                stat.innerText = "✅ Berhasil!"; stat.style.color = "green"; location.reload();
+        if(!confirm("Data lokal akan ditimpa. Lanjutkan?")) return;
+        const btn=document.getElementById('btn-download'); btn.innerText="⏳ Fetching..."; btn.disabled=true;
+        fetch(GOOGLE_SCRIPT_URL).then(r=>r.json()).then(r=>{
+            if(r.siswa) {
+                dataSiswa=r.siswa; dbAbsen=r.absen||{}; dbJurnal=r.jurnal||{}; dbInfoTugas=r.tugas||{}; dbJurnalGuru=r.jurnalGuru||{};
+                localStorage.setItem('app_sman1_siswa', JSON.stringify(dataSiswa));
+                localStorage.setItem('app_sman1_absen', JSON.stringify(dbAbsen));
+                localStorage.setItem('app_sman1_jurnal', JSON.stringify(dbJurnal));
+                localStorage.setItem('app_sman1_infotugas', JSON.stringify(dbInfoTugas));
+                localStorage.setItem('app_sman1_jurnalguru', JSON.stringify(dbJurnalGuru));
+                location.reload();
             }
-        })
-        .catch(err => { btn.disabled = false; btn.innerText = "⬇️ Ambil Data"; stat.innerText = "❌ Gagal."; });
+        }).catch(e=>{ btn.innerText="⬇️ Ambil Data"; btn.disabled=false; alert("Gagal mengambil data."); });
     }
 
-    // --- EXISTING LOGIC ---
+    // --- COMMON UTILS ---
     function renderPresensi() {
         const tgl = document.getElementById('tgl-harian').value;
         const keyJurnal = currentKelas + "_" + tgl;
@@ -333,88 +477,15 @@
         document.getElementById('body-nilai').innerHTML = siswaKelas.map((s, i) => {
             if(!s.n.t1) s.n.t1=0; if(!s.n.t2) s.n.t2=0; if(!s.n.t3) s.n.t3=0; if(!s.n.t4) s.n.t4=0; if(!s.n.t5) s.n.t5=0;
             const n = s.n; const total = n.t1+n.t2+n.t3+n.t4+n.t5+n.uh1+n.uh2+n.uts+n.uas; const avg = (total / 9).toFixed(1);
-            return `<tr><td class="text-center">${i+1}</td><td>${s.nama}</td>
-            <td><input class="input-nilai" type="number" value="${n.t1}" onchange="saveN('${s.id}','t1',this.value)"></td><td><input class="input-nilai" type="number" value="${n.t2}" onchange="saveN('${s.id}','t2',this.value)"></td><td><input class="input-nilai" type="number" value="${n.t3}" onchange="saveN('${s.id}','t3',this.value)"></td><td><input class="input-nilai" type="number" value="${n.t4}" onchange="saveN('${s.id}','t4',this.value)"></td><td><input class="input-nilai" type="number" value="${n.t5}" onchange="saveN('${s.id}','t5',this.value)"></td><td><input class="input-nilai" type="number" value="${n.uh1}" onchange="saveN('${s.id}','uh1',this.value)"></td><td><input class="input-nilai" type="number" value="${n.uh2}" onchange="saveN('${s.id}','uh2',this.value)"></td><td><input class="input-nilai" type="number" value="${n.uts}" onchange="saveN('${s.id}','uts',this.value)"></td><td><input class="input-nilai" type="number" value="${n.uas}" onchange="saveN('${s.id}','uas',this.value)"></td><td class="text-center text-bold">${avg}</td></tr>`;
+            return `<tr><td class="text-center">${i+1}</td><td>${s.nama}</td><td><input class="input-nilai" type="number" value="${n.t1}" onchange="saveN('${s.id}','t1',this.value)"></td><td><input class="input-nilai" type="number" value="${n.t2}" onchange="saveN('${s.id}','t2',this.value)"></td><td><input class="input-nilai" type="number" value="${n.t3}" onchange="saveN('${s.id}','t3',this.value)"></td><td><input class="input-nilai" type="number" value="${n.t4}" onchange="saveN('${s.id}','t4',this.value)"></td><td><input class="input-nilai" type="number" value="${n.t5}" onchange="saveN('${s.id}','t5',this.value)"></td><td><input class="input-nilai" type="number" value="${n.uh1}" onchange="saveN('${s.id}','uh1',this.value)"></td><td><input class="input-nilai" type="number" value="${n.uh2}" onchange="saveN('${s.id}','uh2',this.value)"></td><td><input class="input-nilai" type="number" value="${n.uts}" onchange="saveN('${s.id}','uts',this.value)"></td><td><input class="input-nilai" type="number" value="${n.uas}" onchange="saveN('${s.id}','uas',this.value)"></td><td class="text-center text-bold">${avg}</td></tr>`;
         }).join('');
     }
     function saveN(id, col, val) { let s = dataSiswa.find(x => x.id === id); if(s) { s.n[col] = parseInt(val) || 0; localStorage.setItem('app_sman1_siswa', JSON.stringify(dataSiswa)); renderNilai(); } }
     function simpanInfoTugas(col, val) { if(!dbInfoTugas[currentKelas]) dbInfoTugas[currentKelas] = {}; dbInfoTugas[currentKelas][col] = val; localStorage.setItem('app_sman1_infotugas', JSON.stringify(dbInfoTugas)); }
-    function toggleRekap() {
-        const mode = document.getElementById('mode-rekap').value;
-        const filterWrap = document.getElementById('filter-wrapper');
-        const filterBulan = document.getElementById('filter-bulan');
-        const filterTanggal = document.getElementById('filter-tanggal');
-        if(mode==='bulanan') { filterWrap.style.display = 'inline-block'; filterBulan.classList.remove('hidden'); filterTanggal.classList.add('hidden'); document.getElementById('judul-rekap').innerText = "REKAPITULASI PRESENSI"; } 
-        else if (mode === 'harian') { filterWrap.style.display = 'inline-block'; filterBulan.classList.add('hidden'); filterTanggal.classList.remove('hidden'); document.getElementById('judul-rekap').innerText = "REKAPITULASI HARIAN"; }
-        else { filterWrap.style.display = 'none'; document.getElementById('judul-rekap').innerText = "REKAPITULASI NILAI"; }
-        renderRekap();
-    }
-    function renderRekap() {
-        if(!currentKelas) return;
-        const mode = document.getElementById('mode-rekap').value;
-        const siswa = dataSiswa.filter(s => s.kelas === currentKelas);
-        const head = document.getElementById('head-rekap');
-        const body = document.getElementById('body-rekap');
-        if(mode === 'bulanan') {
-            const bln = document.getElementById('filter-bulan').value;
-            document.getElementById('print-periode').innerText = "PERIODE: " + bln;
-            let dates = [];
-            Object.keys(dbAbsen).forEach(tgl => { if(tgl.startsWith(bln) && siswa.some(s => dbAbsen[tgl] && dbAbsen[tgl][s.id])) dates.push(tgl); });
-            dates.sort();
-            let hRow = `<tr><th rowspan="2" width="30px">No</th><th rowspan="2" style="min-width:200px;text-align:left;">Nama Siswa</th>`;
-            if(dates.length > 0) {
-                dates.forEach(tgl => {
-                    const pert = dbJurnal[currentKelas+"_"+tgl] || "";
-                    const parts = tgl.split('-'); const tglFormat = parts[2] + '/' + parts[1];
-                    hRow += `<th class="text-center cell-date" style="background:#fff">${tglFormat}<br><small style="font-size:0.6em; color:#666">${pert?'P-'+pert:''}</small></th>`;
-                });
-            } else { hRow += `<th>-</th>`; }
-            hRow += `<th colspan="4" style="background:#f0f0f0">Total</th></tr><tr>`;
-            if(dates.length === 0) hRow += `<th></th>`; else dates.forEach(() => hRow += `<th style="padding:0;"></th>`);
-            hRow += `<th class="bg-h text-center" width="25">H</th><th class="bg-s text-center" width="25">S</th><th class="bg-i text-center" width="25">I</th><th class="bg-a text-center" width="25">A</th></tr>`;
-            head.innerHTML = hRow;
-            body.innerHTML = siswa.map((s, i) => {
-                let h=0, sk=0, ij=0, al=0; let cols = "";
-                if(dates.length === 0) cols = "<td class='text-center'>-</td>";
-                else {
-                    dates.forEach(tgl => {
-                        const st = dbAbsen[tgl] ? (dbAbsen[tgl][s.id]||"") : "";
-                        if(st=='H') h++; if(st=='S') sk++; if(st=='I') ij++; if(st=='A') al++;
-                        let bg=""; if(st=='S') bg='bg-s'; if(st=='I') bg='bg-i'; if(st=='A') bg='bg-a';
-                        cols += `<td class="text-center ${bg} cell-status">${st}</td>`;
-                    });
-                }
-                return `<tr><td class="text-center">${i+1}</td><td>${s.nama}</td>${cols}<td class="text-center text-bold">${h}</td><td class="text-center">${sk}</td><td class="text-center">${ij}</td><td class="text-center" style="color:red;font-weight:bold;">${al}</td></tr>`;
-            }).join('');
-        } 
-        else if (mode === 'harian') {
-            const tgl = document.getElementById('filter-tanggal').value;
-            const pert = dbJurnal[currentKelas+"_"+tgl] || "-";
-            document.getElementById('print-periode').innerText = "TANGGAL: " + tgl + " (Pertemuan ke-" + pert + ")";
-            head.innerHTML = `<tr><th width="5%">No</th><th>Nama Siswa</th><th width="15%">Status</th><th>Keterangan</th></tr>`;
-            const absen = dbAbsen[tgl] || {};
-            body.innerHTML = siswa.map((s, i) => {
-                const st = absen[s.id] || "";
-                let bg=""; if(st=='H') bg='bg-h'; if(st=='S') bg='bg-s'; if(st=='I') bg='bg-i'; if(st=='A') bg='bg-a';
-                let badge = st ? `<span class="badge ${bg}">${st}</span>` : '-';
-                return `<tr><td class="text-center">${i+1}</td><td>${s.nama}</td><td class="text-center">${badge}</td><td>${getKet(st)}</td></tr>`;
-            }).join('');
-        }
-        else if (mode === 'nilai') {
-            document.getElementById('print-periode').innerText = "SEMESTER INI";
-            head.innerHTML = `<tr><th rowspan="2" width="30px">No</th><th rowspan="2" style="min-width:200px;">Nama Siswa</th><th colspan="5">Tugas</th><th colspan="2">UH</th><th rowspan="2">UTS</th><th rowspan="2">UAS</th><th rowspan="2">Rata</th></tr><tr><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>1</th><th>2</th></tr>`;
-            body.innerHTML = siswa.map((s, i) => {
-                const n = s.n; const total = n.t1+n.t2+n.t3+n.t4+n.t5+n.uh1+n.uh2+n.uts+n.uas; const avg = (total / 9).toFixed(1);
-                return `<tr><td class="text-center">${i+1}</td><td>${s.nama}</td><td class="text-center">${n.t1}</td><td class="text-center">${n.t2}</td><td class="text-center">${n.t3}</td><td class="text-center">${n.t4}</td><td class="text-center">${n.t5}</td><td class="text-center">${n.uh1}</td><td class="text-center">${n.uh2}</td><td class="text-center">${n.uts}</td><td class="text-center">${n.uas}</td><td class="text-center text-bold">${avg}</td></tr>`;
-            }).join('');
-        }
-    }
     function exportExcel() { if(!currentKelas) return alert("Pilih kelas dulu!"); const table = document.getElementById('tabel-rekap'); const wb = XLSX.utils.table_to_book(table, {sheet: "Rekap"}); const mode = document.getElementById('mode-rekap').value; const periode = (mode==='bulanan') ? document.getElementById('filter-bulan').value : document.getElementById('filter-tanggal').value; const filename = "Rekap_" + currentKelas.replace(/ /g, '_') + "_" + periode + ".xlsx"; XLSX.writeFile(wb, filename); }
-    function sinkronisasi(alertMsg=true) { let count = 0; MASTER_SISWA.forEach(m => { const exist = dataSiswa.find(d => d.nama === m.nama && d.kelas === m.kelas); if(!exist) { dataSiswa.push({id: 'S'+Date.now()+Math.floor(Math.random()*999), nama: m.nama, kelas: m.kelas, n: {t1:0,t2:0,t3:0,t4:0,t5:0,uh1:0,uh2:0,uts:0,uas:0}}); count++; } }); localStorage.setItem('app_sman1_siswa', JSON.stringify(dataSiswa)); if(alertMsg) alert(count + " Siswa baru ditambahkan!"); document.getElementById('count-siswa').innerText = dataSiswa.length; initUI(); }
+    function sinkronisasi(alertMsg=true) { let count = 0; MASTER_SISWA.forEach(m => { const exist = dataSiswa.find(d => d.nama === m.nama && d.kelas === m.kelas); if(!exist) { dataSiswa.push({id: 'S'+Date.now()+Math.floor(Math.random()*999), nama: m.nama, kelas: m.kelas, n: {t1:0,t2:0,t3:0,t4:0,t5:0,uh1:0,uh2:0,uts:0,uas:0}}); count++; } }); localStorage.setItem('app_sman1_siswa', JSON.stringify(dataSiswa)); if(alertMsg) alert(count + " Siswa baru ditambahkan!"); initUI(); }
     function resetAll() { if(confirm("Yakin hapus semua data?")) { localStorage.clear(); location.reload(); } }
     function getKet(s) { if(s=='H') return 'Hadir'; if(s=='S') return 'Sakit'; if(s=='I') return 'Izin'; if(s=='A') return 'Alpha'; return ''; }
 </script>
 </body>
 </html>
-
-
