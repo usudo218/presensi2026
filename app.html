@@ -89,11 +89,18 @@
 
     <div id="tab-rekap" class="tab-content">
         <div class="toolbar">
-            <select id="mode-rekap" onchange="toggleRekap()" style="padding:8px;"><option value="bulanan">🗓 Rekap Bulanan</option><option value="harian">📆 Rekap Harian</option></select>
-            <input type="month" id="filter-bulan" onchange="renderRekap()"><input type="date" id="filter-tanggal" class="hidden" onchange="renderRekap()">
+            <select id="mode-rekap" onchange="toggleRekap()" style="padding:8px;">
+                <option value="bulanan">🗓 Rekap Presensi (Bulanan)</option>
+                <option value="harian">📆 Rekap Presensi (Harian)</option>
+                <option value="nilai">📝 Rekap Nilai (Semester)</option>
+            </select>
+            <div id="filter-wrapper" style="display:inline-block;">
+                <input type="month" id="filter-bulan" onchange="renderRekap()">
+                <input type="date" id="filter-tanggal" class="hidden" onchange="renderRekap()">
+            </div>
             <div style="margin-left:auto;"><button class="btn btn-green" onclick="exportExcel()">📥 Excel</button><button class="btn btn-print" onclick="window.print()">🖨 Cetak</button></div>
         </div>
-        <div class="print-header">REKAPITULASI PRESENSI KELAS <span id="print-kelas"></span><br><small id="print-periode" style="font-weight:normal"></small></div>
+        <div class="print-header"><span id="judul-rekap">REKAPITULASI PRESENSI</span> KELAS <span id="print-kelas"></span><br><small id="print-periode" style="font-weight:normal"></small></div>
         <div class="table-wrap"><table id="tabel-rekap"><thead id="head-rekap"></thead><tbody id="body-rekap"></tbody></table></div>
         <div class="signature-block">Muncar, <span id="tgl-cetak"></span><br>Guru Mata Pelajaran<br><br><br><br><strong><u>Agus Suyatno, S.Kom</u></strong><br>NIP. 19730213 202521 1 032</div>
     </div>
@@ -101,21 +108,18 @@
     <div id="tab-setting" class="tab-content">
         <h3>☁️ Sinkronisasi Google Spreadsheet</h3>
         <p>Hubungkan aplikasi dengan Google Sheet agar data <strong>TIDAK HILANG</strong> saat ganti HP/Clear History.</p>
-        
         <div class="cloud-box">
             <h4>1. Simpan ke Cloud (Upload)</h4>
             <p>Klik tombol ini setelah selesai input data agar tersimpan di Google Sheet.</p>
             <button class="btn btn-blue" id="btn-upload" onclick="uploadToCloud()">☁️ Simpan Data ke Google Sheet</button>
             <span id="status-upload" class="cloud-status"></span>
         </div>
-
         <div class="cloud-box" style="background:#d1e7dd; border-color:#badbcc;">
             <h4>2. Ambil dari Cloud (Download)</h4>
             <p>Klik tombol ini saat ganti HP atau data di browser kosong.</p>
             <button class="btn btn-green" id="btn-download" onclick="downloadFromCloud()">⬇️ Ambil Data dari Google Sheet</button>
             <span id="status-download" class="cloud-status"></span>
         </div>
-
         <hr>
         <h4>Reset Lokal</h4>
         <p>Jumlah Siswa: <strong id="count-siswa">0</strong></p>
@@ -180,39 +184,22 @@
         const stat = document.getElementById('status-upload');
         btn.disabled = true; btn.innerText = "⏳ Sedang Mengirim..."; stat.innerText = "";
 
-        const payload = {
-            action: 'simpan',
-            data: { siswa: dataSiswa, absen: dbAbsen, jurnal: dbJurnal, tugas: dbInfoTugas }
-        };
+        const payload = { action: 'simpan', data: { siswa: dataSiswa, absen: dbAbsen, jurnal: dbJurnal, tugas: dbInfoTugas } };
 
-        fetch(GOOGLE_SCRIPT_URL, {
-            method: 'POST',
-            body: JSON.stringify(payload)
-        })
+        fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) })
         .then(res => res.json())
         .then(res => {
             btn.disabled = false; btn.innerText = "☁️ Simpan Data ke Google Sheet";
-            if(res.status === 'sukses') {
-                stat.innerText = "✅ Sukses! Data tersimpan di Spreadsheet.";
-                stat.style.color = "green";
-                alert("Berhasil disimpan ke Google Sheet!");
-            }
+            if(res.status === 'sukses') { stat.innerText = "✅ Sukses!"; stat.style.color = "green"; alert("Berhasil disimpan!"); }
         })
-        .catch(err => {
-            btn.disabled = false; btn.innerText = "☁️ Simpan Data ke Google Sheet";
-            stat.innerText = "❌ Gagal. Cek koneksi internet.";
-            stat.style.color = "red";
-            alert("Gagal koneksi ke Google Script.");
-        });
+        .catch(err => { btn.disabled = false; btn.innerText = "☁️ Simpan Data ke Google Sheet"; stat.innerText = "❌ Gagal."; stat.style.color = "red"; alert("Gagal koneksi."); });
     }
 
     function downloadFromCloud() {
         if(GOOGLE_SCRIPT_URL.includes("ISI_URL")) return alert("Harap pasang URL Google Script dulu di kode!");
         const btn = document.getElementById('btn-download');
         const stat = document.getElementById('status-download');
-        
         if(!confirm("Data di HP ini akan ditimpa dengan data dari Google Sheet. Lanjutkan?")) return;
-        
         btn.disabled = true; btn.innerText = "⏳ Sedang Mengambil..."; stat.innerText = "";
 
         fetch(GOOGLE_SCRIPT_URL)
@@ -223,19 +210,11 @@
                 dbAbsen = res.absen || {}; localStorage.setItem('app_sman1_absen', JSON.stringify(dbAbsen));
                 dbJurnal = res.jurnal || {}; localStorage.setItem('app_sman1_jurnal', JSON.stringify(dbJurnal));
                 dbInfoTugas = res.tugas || {}; localStorage.setItem('app_sman1_infotugas', JSON.stringify(dbInfoTugas));
-                
                 btn.disabled = false; btn.innerText = "⬇️ Ambil Data dari Google Sheet";
-                stat.innerText = "✅ Data berhasil dipulihkan!";
-                stat.style.color = "green";
-                alert("Data berhasil diambil! Halaman akan dimuat ulang.");
-                location.reload();
+                stat.innerText = "✅ Berhasil!"; stat.style.color = "green"; alert("Data berhasil diambil! Halaman akan dimuat ulang."); location.reload();
             }
         })
-        .catch(err => {
-            btn.disabled = false; btn.innerText = "⬇️ Ambil Data dari Google Sheet";
-            stat.innerText = "❌ Gagal mengambil data.";
-            stat.style.color = "red";
-        });
+        .catch(err => { btn.disabled = false; btn.innerText = "⬇️ Ambil Data dari Google Sheet"; stat.innerText = "❌ Gagal."; stat.style.color = "red"; });
     }
 
     // CORE LOGIC
@@ -267,18 +246,39 @@
     }
     function saveN(id, col, val) { let s = dataSiswa.find(x => x.id === id); if(s) { s.n[col] = parseInt(val) || 0; localStorage.setItem('app_sman1_siswa', JSON.stringify(dataSiswa)); renderNilai(); } }
     function simpanInfoTugas(col, val) { if(!dbInfoTugas[currentKelas]) dbInfoTugas[currentKelas] = {}; dbInfoTugas[currentKelas][col] = val; localStorage.setItem('app_sman1_infotugas', JSON.stringify(dbInfoTugas)); }
+    
     function toggleRekap() {
         const mode = document.getElementById('mode-rekap').value;
-        if(mode==='bulanan') { document.getElementById('filter-bulan').classList.remove('hidden'); document.getElementById('filter-tanggal').classList.add('hidden'); } 
-        else { document.getElementById('filter-bulan').classList.add('hidden'); document.getElementById('filter-tanggal').classList.remove('hidden'); }
+        const filterWrap = document.getElementById('filter-wrapper');
+        const filterBulan = document.getElementById('filter-bulan');
+        const filterTanggal = document.getElementById('filter-tanggal');
+        
+        if(mode==='bulanan') { 
+            filterWrap.style.display = 'inline-block';
+            filterBulan.classList.remove('hidden'); 
+            filterTanggal.classList.add('hidden');
+            document.getElementById('judul-rekap').innerText = "REKAPITULASI PRESENSI"; 
+        } 
+        else if (mode === 'harian') { 
+            filterWrap.style.display = 'inline-block';
+            filterBulan.classList.add('hidden'); 
+            filterTanggal.classList.remove('hidden'); 
+            document.getElementById('judul-rekap').innerText = "REKAPITULASI HARIAN";
+        }
+        else { // NILAI
+            filterWrap.style.display = 'none';
+            document.getElementById('judul-rekap').innerText = "REKAPITULASI NILAI";
+        }
         renderRekap();
     }
+
     function renderRekap() {
         if(!currentKelas) return;
         const mode = document.getElementById('mode-rekap').value;
         const siswa = dataSiswa.filter(s => s.kelas === currentKelas);
         const head = document.getElementById('head-rekap');
         const body = document.getElementById('body-rekap');
+
         if(mode === 'bulanan') {
             const bln = document.getElementById('filter-bulan').value;
             document.getElementById('print-periode').innerText = "PERIODE: " + bln;
@@ -310,7 +310,8 @@
                 }
                 return `<tr><td class="text-center">${i+1}</td><td>${s.nama}</td>${cols}<td class="text-center text-bold">${h}</td><td class="text-center">${sk}</td><td class="text-center">${ij}</td><td class="text-center" style="color:red;font-weight:bold;">${al}</td></tr>`;
             }).join('');
-        } else {
+        } 
+        else if (mode === 'harian') {
             const tgl = document.getElementById('filter-tanggal').value;
             const pert = dbJurnal[currentKelas+"_"+tgl] || "-";
             document.getElementById('print-periode').innerText = "TANGGAL: " + tgl + " (Pertemuan ke-" + pert + ")";
@@ -321,6 +322,14 @@
                 let bg=""; if(st=='H') bg='bg-h'; if(st=='S') bg='bg-s'; if(st=='I') bg='bg-i'; if(st=='A') bg='bg-a';
                 let badge = st ? `<span class="badge ${bg}">${st}</span>` : '-';
                 return `<tr><td class="text-center">${i+1}</td><td>${s.nama}</td><td class="text-center">${badge}</td><td>${getKet(st)}</td></tr>`;
+            }).join('');
+        }
+        else if (mode === 'nilai') {
+            document.getElementById('print-periode').innerText = "SEMESTER INI";
+            head.innerHTML = `<tr><th rowspan="2" width="30px">No</th><th rowspan="2" style="min-width:200px;">Nama Siswa</th><th colspan="5">Tugas</th><th colspan="2">UH</th><th rowspan="2">UTS</th><th rowspan="2">UAS</th><th rowspan="2">Rata</th></tr><tr><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>1</th><th>2</th></tr>`;
+            body.innerHTML = siswa.map((s, i) => {
+                const n = s.n; const total = n.t1+n.t2+n.t3+n.t4+n.t5+n.uh1+n.uh2+n.uts+n.uas; const avg = (total / 9).toFixed(1);
+                return `<tr><td class="text-center">${i+1}</td><td>${s.nama}</td><td class="text-center">${n.t1}</td><td class="text-center">${n.t2}</td><td class="text-center">${n.t3}</td><td class="text-center">${n.t4}</td><td class="text-center">${n.t5}</td><td class="text-center">${n.uh1}</td><td class="text-center">${n.uh2}</td><td class="text-center">${n.uts}</td><td class="text-center">${n.uas}</td><td class="text-center text-bold">${avg}</td></tr>`;
             }).join('');
         }
     }
